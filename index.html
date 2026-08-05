@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZFLIX - Free Movies & Web Series</title>
+  <title>ZFLIX - Movies & Web Series</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background-color: #0b0c10; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 40px; }
@@ -20,7 +20,9 @@
     .hero-bg { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0.4; }
     .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #0b0c10 10%, transparent 90%); }
     .hero-content { position: relative; z-index: 2; padding: 25px; width: 100%; }
-    .badge { background: #E50914; color: #fff; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 8px; }
+    .badge-group { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .badge { background: #E50914; color: #fff; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; }
+    .imdb-badge { background: #f5c518; color: #000; font-weight: 900; font-size: 11px; padding: 3px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px; }
     .hero-title { font-size: 24px; font-weight: bold; margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
     .watch-btn { background: #E50914; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
     .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: #fff; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #333; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 3; }
@@ -40,9 +42,17 @@
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
     .card { background: #16181f; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s; border: 1px solid #222630; }
     .card:hover { transform: translateY(-4px); }
-    .card img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .card-img-wrapper { position: relative; width: 100%; height: 200px; background: #1a1d26; }
+    .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card-imdb { position: absolute; top: 5px; left: 5px; background: rgba(245, 197, 24, 0.95); color: #000; font-weight: 900; font-size: 10px; padding: 2px 6px; border-radius: 3px; z-index: 4; }
+    
+    /* Action Buttons (Edit & Delete) */
+    .card-actions { position: absolute; top: 5px; right: 5px; display: flex; gap: 4px; z-index: 5; }
+    .action-btn { border: none; padding: 4px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; color: #fff; font-weight: bold; }
+    .btn-edit { background: rgba(255, 165, 0, 0.9); }
+    .btn-delete { background: rgba(229, 9, 20, 0.9); }
+
     .card-title { padding: 8px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
-    .del-btn { position: absolute; top: 5px; right: 5px; background: rgba(229, 9, 20, 0.9); color: #fff; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px; cursor: pointer; z-index: 5; }
 
     /* Footer */
     footer { text-align: center; font-size: 12px; color: #555; margin-top: 40px; }
@@ -55,7 +65,7 @@
     iframe { width: 100%; height: 420px; border: none; }
 
     /* Admin Modal */
-    .admin-box { background: #16181f; padding: 25px; border-radius: 8px; width: 90%; max-width: 400px; border: 1px solid #222630; position: relative; }
+    .admin-box { background: #16181f; padding: 25px; border-radius: 8px; width: 90%; max-width: 400px; border: 1px solid #222630; position: relative; max-height: 90vh; overflow-y: auto; }
     .admin-box h3 { margin-bottom: 15px; color: #E50914; }
     .input-group { margin-bottom: 12px; }
     .input-group label { display: block; font-size: 12px; margin-bottom: 5px; color: #aaa; }
@@ -76,10 +86,13 @@
   <div class="hero-container">
     <div class="nav-arrow prev-btn" onclick="prevSlide()">&lt;</div>
     <div class="nav-arrow next-btn" onclick="nextSlide()">&gt;</div>
-    <img id="heroImg" class="hero-bg" src="" alt="">
+    <img id="heroImg" class="hero-bg" src="" alt="" onerror="this.src='https://placehold.co/600x400/16181f/fff?text=No+Poster'">
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <span class="badge">Featured</span>
+      <div class="badge-group">
+        <span class="badge">Featured</span>
+        <span class="imdb-badge" id="heroImdb">⭐ IMDb --</span>
+      </div>
       <div class="hero-title" id="heroTitle">Loading...</div>
       <button class="watch-btn" id="heroWatchBtn">▶ Watch Now</button>
     </div>
@@ -119,14 +132,18 @@
     </div>
   </div>
 
-  <!-- Hidden Admin Panel Modal -->
+  <!-- Admin Panel Modal -->
   <div class="modal" id="adminPanel">
     <div class="admin-box">
       <span class="close-btn" onclick="closeAdmin()">&times;</span>
-      <h3>Admin Panel</h3>
+      <h3 id="adminModalTitle">Add / Edit Movie</h3>
       <div class="input-group">
         <label>Movie Title</label>
         <input type="text" id="titleInput" placeholder="Enter title...">
+      </div>
+      <div class="input-group">
+        <label>IMDb Rating (e.g. 8.2)</label>
+        <input type="text" id="imdbInput" placeholder="e.g. 8.2">
       </div>
       <div class="input-group">
         <label>Category</label>
@@ -145,14 +162,14 @@
         </select>
       </div>
       <div class="input-group">
-        <label>ImgBB Poster Link</label>
+        <label>ImgBB Poster Direct Link (.jpg / .png)</label>
         <input type="text" id="posterInput" placeholder="https://i.ibb.co/...">
       </div>
       <div class="input-group">
         <label>Streamtape Embed Link</label>
         <input type="text" id="streamInput" placeholder="https://streamtape.com/e/...">
       </div>
-      <button class="save-btn" onclick="addMovie()">Save Movie</button>
+      <button class="save-btn" onclick="saveMovie()">Save Movie</button>
     </div>
   </div>
 
@@ -161,6 +178,7 @@
     let currentSlide = 0;
     let selectedCategory = 'All';
     let selectedGenre = 'All';
+    let editIndex = -1;
 
     // Secret Admin Trigger (Type 5 times 'x' in search box)
     function handleSearch(val) {
@@ -168,7 +186,7 @@
         document.getElementById('searchInput').value = '';
         const pwd = prompt("Enter Admin Password:");
         if (pwd === "1234") {
-          document.getElementById('adminPanel').style.display = 'flex';
+          openAdminForAdd();
         } else if (pwd !== null) {
           alert("Incorrect Password!");
         }
@@ -178,20 +196,41 @@
       renderGrid();
     }
 
+    function openAdminForAdd() {
+      editIndex = -1;
+      document.getElementById('adminModalTitle').innerText = "Add New Movie";
+      document.getElementById('titleInput').value = '';
+      document.getElementById('imdbInput').value = '';
+      document.getElementById('posterInput').value = '';
+      document.getElementById('streamInput').value = '';
+      document.getElementById('adminPanel').style.display = 'flex';
+    }
+
     function renderHero() {
       if (movies.length === 0) {
         document.getElementById('heroTitle').innerText = 'No Movies Added';
         document.getElementById('heroImg').src = '';
+        document.getElementById('heroImdb').innerText = '⭐ IMDb N/A';
         return;
       }
       const m = movies[currentSlide % movies.length];
       document.getElementById('heroTitle').innerText = m.title;
-      document.getElementById('heroImg').src = m.poster;
+      document.getElementById('heroImg').src = fixImageLink(m.poster);
+      document.getElementById('heroImdb').innerText = `⭐ IMDb ${m.imdb || 'N/A'}`;
       document.getElementById('heroWatchBtn').onclick = () => playVideo(m.streamUrl);
     }
 
     function prevSlide() { if(movies.length) { currentSlide = (currentSlide - 1 + movies.length) % movies.length; renderHero(); } }
     function nextSlide() { if(movies.length) { currentSlide = (currentSlide + 1) % movies.length; renderHero(); } }
+
+    function fixImageLink(url) {
+      if (!url) return '';
+      // Convert ibb.co webpage link to direct i.ibb.co link if user pastes page URL
+      if (url.includes('ibb.co/') && !url.includes('i.ibb.co/')) {
+        return url.replace('ibb.co/', 'i.ibb.co/') + '.jpg';
+      }
+      return url;
+    }
 
     function renderGrid() {
       const grid = document.getElementById('movieGrid');
@@ -206,7 +245,7 @@
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = '<p style="color:#555; grid-column: 1/-1;">Koi movie nahi hai. Admin panel se add karein.</p>';
+        grid.innerHTML = '<p style="color:#555; grid-column: 1/-1;">Koi movie nahi hai. Search bar me xxxxx likh kar add karein.</p>';
         return;
       }
 
@@ -214,8 +253,14 @@
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-          <button class="del-btn" onclick="event.stopPropagation(); deleteMovie(${idx})">X</button>
-          <img src="${m.poster}" onclick="playVideo('${m.streamUrl}')">
+          <div class="card-actions">
+            <button class="action-btn btn-edit" onclick="event.stopPropagation(); editMovie(${idx})">✏️</button>
+            <button class="action-btn btn-delete" onclick="event.stopPropagation(); deleteMovie(${idx})">🗑️</button>
+          </div>
+          <div class="card-img-wrapper" onclick="playVideo('${m.streamUrl}')">
+            <span class="card-imdb">⭐ ${m.imdb || 'N/A'}</span>
+            <img src="${fixImageLink(m.poster)}" onerror="this.src='https://placehold.co/300x450/16181f/fff?text=No+Poster'">
+          </div>
           <div class="card-title">${m.title}</div>
         `;
         grid.appendChild(card);
@@ -250,28 +295,45 @@
 
     function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
 
-    function addMovie() {
+    function editMovie(idx) {
+      editIndex = idx;
+      const m = movies[idx];
+      document.getElementById('adminModalTitle').innerText = "Edit Movie";
+      document.getElementById('titleInput').value = m.title || '';
+      document.getElementById('imdbInput').value = m.imdb || '';
+      document.getElementById('catInput').value = m.category || 'Bollywood';
+      document.getElementById('genreInput').value = m.genre || 'Action';
+      document.getElementById('posterInput').value = m.poster || '';
+      document.getElementById('streamInput').value = m.streamUrl || '';
+      document.getElementById('adminPanel').style.display = 'flex';
+    }
+
+    function saveMovie() {
       const title = document.getElementById('titleInput').value.trim();
+      const imdb = document.getElementById('imdbInput').value.trim();
       const category = document.getElementById('catInput').value;
       const genre = document.getElementById('genreInput').value;
       const poster = document.getElementById('posterInput').value.trim();
       const streamUrl = document.getElementById('streamInput').value.trim();
 
-      if (!title || !poster || !streamUrl) { alert('Saare fields bharein!'); return; }
+      if (!title || !poster || !streamUrl) { alert('Title, Poster link aur Stream link zaruri hain!'); return; }
 
-      movies.push({ title, category, genre, poster, streamUrl });
+      const movieData = { title, imdb, category, genre, poster, streamUrl };
+
+      if (editIndex >= 0) {
+        movies[editIndex] = movieData;
+      } else {
+        movies.push(movieData);
+      }
+
       localStorage.setItem('zflix_movies', JSON.stringify(movies));
-
-      document.getElementById('titleInput').value = '';
-      document.getElementById('posterInput').value = '';
-      document.getElementById('streamInput').value = '';
       closeAdmin();
       renderHero();
       renderGrid();
     }
 
     function deleteMovie(idx) {
-      if (confirm('Is movie ko delete karein?')) {
+      if (confirm('Kya aap is movie ko delete karna chahte hain?')) {
         movies.splice(idx, 1);
         localStorage.setItem('zflix_movies', JSON.stringify(movies));
         renderHero();
