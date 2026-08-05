@@ -259,13 +259,48 @@
     </div>
   </div>
 
+  <!-- Firebase Compat Libraries -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
   <script>
-    let movies = JSON.parse(localStorage.getItem('zflix_movies')) || [];
+    // Aapki Exact Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyA2yXT2VlPBhGo59i_DX5fkNHyLqEPxZ8E",
+      authDomain: "zflixhub.firebaseapp.com",
+      projectId: "zflixhub",
+      storageBucket: "zflixhub.firebasestorage.app",
+      messagingSenderId: "266059597167",
+      appId: "1:266059597167:web:8754d8b8ece45c6d4b149a",
+      measurementId: "G-EKN0RYY5HK"
+    };
+
+    // Firebase Initialize
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let movies = [];
     let currentSlide = 0;
     let selectedCategory = 'All';
     let selectedGenre = 'All';
-    let editIndex = -1;
+    let editDocId = null;
     let activeMovieObj = null;
+
+    // REAL-TIME FIRESTORE LISTENER (Live Sync)
+    db.collection("movies").onSnapshot((snapshot) => {
+      movies = [];
+      snapshot.forEach((doc) => {
+        movies.push({ id: doc.id, ...doc.data() });
+      });
+
+      renderHero();
+      renderGrid();
+      if (document.getElementById('adminPanel').style.display === 'flex') {
+        renderAdminList();
+      }
+    }, (error) => {
+      console.error("Firebase Error:", error);
+    });
 
     // Admin Access via Search ('xxxxx')
     function handleSearch(val) {
@@ -312,7 +347,7 @@
     }
 
     function openAdminPanel() {
-      editIndex = -1;
+      editDocId = null;
       document.getElementById('adminModalTitle').innerText = "Add New Movie";
       resetAdminForm();
       renderAdminList();
@@ -331,54 +366,43 @@
       document.getElementById('trailerInput').value = '';
     }
 
-    // Embed URL Cleaners for Ok.ru & Streamtape
+    // Embed URL Cleaners
     function fixOkruUrl(url) {
       if (!url) return '';
       url = url.trim();
-
-      // Extract src if full iframe is passed
       if (url.includes('<iframe')) {
         const match = url.match(/src=["']([^"']+)["']/);
         if (match && match[1]) url = match[1];
       }
-
-      // Convert regular ok.ru/video/ to ok.ru/videoembed/
       if (url.includes('ok.ru/video/') && !url.includes('videoembed')) {
         url = url.replace('/video/', '/videoembed/');
       }
-      
       if (!url.startsWith('http://') && !url.startsWith('https://') && url.length > 5) {
         url = 'https://ok.ru/videoembed/' + url;
       }
-
       return url;
     }
 
     function fixStreamtapeUrl(url) {
       if (!url) return '';
       url = url.trim();
-
       if (url.includes('<iframe')) {
         const match = url.match(/src=["']([^"']+)["']/);
         if (match && match[1]) url = match[1];
       }
-
       if (url.includes('streamtape.com/v/')) {
         url = url.replace('/v/', '/e/');
       }
-
       return url;
     }
 
     function fixYoutubeLink(url) {
       if (!url) return '';
       url = url.trim();
-
       if (url.includes('<iframe')) {
         const match = url.match(/src=["']([^"']+)["']/);
         if (match && match[1]) url = match[1];
       }
-
       if (url.includes('watch?v=')) return url.replace('watch?v=', 'embed/');
       if (url.includes('youtu.be/')) return url.replace('youtu.be/', 'youtube.com/embed/');
       return url;
@@ -395,7 +419,7 @@
       document.getElementById('heroTitle').innerText = m.title;
       document.getElementById('heroImg').src = m.poster || 'https://placehold.co/600x400/16181f/fff?text=No+Poster';
       document.getElementById('heroImdb').innerText = `⭐ IMDb ${m.imdb || 'N/A'}`;
-      document.getElementById('heroWatchBtn').onclick = () => playMovie(currentSlide % movies.length);
+      document.getElementById('heroWatchBtn').onclick = () => playMovie(m.id);
     }
 
     function prevSlide() { if(movies.length) { currentSlide = (currentSlide - 1 + movies.length) % movies.length; renderHero(); } }
@@ -409,7 +433,7 @@
       const filtered = movies.filter(m => {
         const matchesCat = (selectedCategory === 'All' || m.category === selectedCategory);
         const matchesGenre = (selectedGenre === 'All' || m.genre === selectedGenre);
-        const matchesSearch = m.title.toLowerCase().includes(searchQuery);
+        const matchesSearch = (m.title || '').toLowerCase().includes(searchQuery);
         return matchesCat && matchesGenre && matchesSearch;
       });
 
@@ -419,10 +443,9 @@
       }
 
       filtered.forEach((m) => {
-        const originalIndex = movies.indexOf(m);
         const card = document.createElement('div');
         card.className = 'card';
-        card.onclick = () => playMovie(originalIndex);
+        card.onclick = () => playMovie(m.id);
         card.innerHTML = `
           <div class="card-img-wrapper">
             <span class="card-imdb">⭐ ${m.imdb || 'N/A'}</span>
@@ -434,11 +457,11 @@
       });
     }
 
-    function playMovie(idx) {
-      activeMovieObj = movies[idx];
+    function playMovie(id) {
+      activeMovieObj = movies.find(m => m.id === id);
       if (!activeMovieObj) return;
 
-      switchServer(1); // Default Server 1 (Ok.ru)
+      switchServer(1);
 
       document.getElementById('mDetailTitle').innerText = activeMovieObj.title;
       document.getElementById('mDetailImdb').innerText = `⭐ IMDb ${activeMovieObj.imdb || 'N/A'}`;
@@ -466,12 +489,10 @@
 
       let targetUrl = '';
       if (serverNum === 1) {
-        // Ok.ru
         targetUrl = fixOkruUrl(activeMovieObj.okruUrl || activeMovieObj.streamUrl);
         btn1.classList.add('active');
         btn2.classList.remove('active');
       } else {
-        // Streamtape
         targetUrl = fixStreamtapeUrl(activeMovieObj.streamUrl);
         btn2.classList.add('active');
         btn1.classList.remove('active');
@@ -513,23 +534,24 @@
         listContainer.innerHTML = '<p style="color:#666; font-size:12px;">No movies found.</p>';
         return;
       }
-      movies.forEach((m, idx) => {
+      movies.forEach((m) => {
         const item = document.createElement('div');
         item.className = 'admin-item';
         item.innerHTML = `
           <span>${m.title}</span>
           <div class="admin-actions">
-            <button class="btn-sm btn-edit" onclick="editMovie(${idx})">Edit</button>
-            <button class="btn-sm btn-del" onclick="deleteMovie(${idx})">Delete</button>
+            <button class="btn-sm btn-edit" onclick="editMovie('${m.id}')">Edit</button>
+            <button class="btn-sm btn-del" onclick="deleteMovie('${m.id}')">Delete</button>
           </div>
         `;
         listContainer.appendChild(item);
       });
     }
 
-    function editMovie(idx) {
-      editIndex = idx;
-      const m = movies[idx];
+    function editMovie(id) {
+      const m = movies.find(item => item.id === id);
+      if(!m) return;
+      editDocId = id;
       document.getElementById('adminModalTitle').innerText = "Edit Movie";
       document.getElementById('titleInput').value = m.title || '';
       document.getElementById('imdbInput').value = m.imdb || '';
@@ -543,7 +565,8 @@
       document.getElementById('trailerInput').value = m.trailerUrl || '';
     }
 
-    function saveMovie() {
+    // FIREBASE SAVE / ADD / UPDATE
+    async function saveMovie() {
       const title = document.getElementById('titleInput').value.trim();
       const imdb = document.getElementById('imdbInput').value.trim();
       const category = document.getElementById('catInput').value;
@@ -557,37 +580,41 @@
 
       if (!title || !poster) { alert('Movie Title aur Poster Link zaroori hai!'); return; }
 
-      const movieData = { title, imdb, category, genre, cast, desc, poster, okruUrl, streamUrl, trailerUrl };
+      const movieData = {
+        title, imdb, category, genre, cast, desc, poster,
+        okruUrl, streamUrl, trailerUrl,
+        updatedAt: new Date().toISOString()
+      };
 
-      if (editIndex >= 0) {
-        movies[editIndex] = movieData;
-      } else {
-        movies.push(movieData);
-      }
+      try {
+        if (editDocId) {
+          await db.collection("movies").doc(editDocId).update(movieData);
+          alert('Movie successfully update ho gayi!');
+        } else {
+          movieData.createdAt = new Date().toISOString();
+          await db.collection("movies").add(movieData);
+          alert('Movie successfully Firebase Database me Save ho gayi!');
+        }
 
-      localStorage.setItem('zflix_movies', JSON.stringify(movies));
-      resetAdminForm();
-      editIndex = -1;
-      document.getElementById('adminModalTitle').innerText = "Add New Movie";
-      renderAdminList();
-      renderHero();
-      renderGrid();
-      alert('Movie successfully save ho gayi!');
-    }
-
-    function deleteMovie(idx) {
-      if (confirm('Kya aap is movie ko delete karna chahte hain?')) {
-        movies.splice(idx, 1);
-        localStorage.setItem('zflix_movies', JSON.stringify(movies));
-        renderAdminList();
-        renderHero();
-        renderGrid();
+        resetAdminForm();
+        editDocId = null;
+        document.getElementById('adminModalTitle').innerText = "Add New Movie";
+      } catch (error) {
+        alert("Save Error: " + error.message);
       }
     }
 
-    // Init Page Load
-    renderHero();
-    renderGrid();
+    // FIREBASE DELETE
+    async function deleteMovie(id) {
+      if (confirm('Kya aap is movie ko permanently delete karna chahte hain?')) {
+        try {
+          await db.collection("movies").doc(id).delete();
+          alert('Movie delete ho gayi!');
+        } catch (error) {
+          alert("Delete Error: " + error.message);
+        }
+      }
+    }
   </script>
 </body>
 </html>
