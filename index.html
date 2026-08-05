@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZFLIX - Free Movies & Web Series</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: #141414; color: #fff; font-family: Arial, sans-serif; }
+    
+    /* Header */
+    header { display: flex; justify-content: space-between; align-items: center; padding: 15px 4%; background: #000; position: sticky; top: 0; z-index: 10; }
+    
+    /* Logo Styling */
+    .logo-container { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .logo-img { height: 35px; width: auto; object-fit: contain; }
+    .logo-text { color: #E50914; font-size: 28px; font-weight: 900; letter-spacing: 2px; font-family: 'Arial Black', Impact, sans-serif; text-transform: uppercase; }
+    
+    .admin-btn { background: #E50914; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    
+    /* Movie Grid */
+    .container { padding: 30px 4%; }
+    h2 { margin-bottom: 20px; font-size: 20px; color: #e5e5e5; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+    .card { background: #222; border-radius: 4px; overflow: hidden; position: relative; transition: transform 0.2s; cursor: pointer; }
+    .card:hover { transform: scale(1.04); }
+    .card img { width: 100%; height: 230px; object-fit: cover; display: block; }
+    .card-title { padding: 10px; font-size: 13px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .del-btn { position: absolute; top: 5px; right: 5px; background: rgba(229, 9, 20, 0.8); color: #fff; border: none; padding: 3px 7px; border-radius: 3px; font-size: 10px; cursor: pointer; }
+
+    /* Video Player Modal */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; z-index: 100; }
+    .modal-content { background: #000; width: 90%; max-width: 800px; position: relative; border-radius: 8px; overflow: hidden; }
+    .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; color: #fff; z-index: 101; }
+    iframe { width: 100%; height: 450px; border: none; }
+
+    /* Admin Panel Modal */
+    .admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 101; }
+    .admin-box { background: #181818; padding: 25px; border-radius: 8px; width: 90%; max-width: 400px; border: 1px solid #333; }
+    .admin-box h3 { margin-bottom: 15px; color: #E50914; }
+    .input-group { margin-bottom: 12px; }
+    .input-group label { display: block; font-size: 12px; margin-bottom: 5px; color: #aaa; }
+    .input-group input { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #333; background: #222; color: #fff; }
+    .save-btn { width: 100%; padding: 10px; background: #E50914; border: none; color: #fff; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-container" onclick="location.reload()">
+      <!-- Agar photo/image logo lagana ho toh niche wali line ka use karein -->
+      <!-- <img src="YOUR_LOGO_IMAGE_URL_HERE" alt="ZFLIX" class="logo-img"> -->
+      <span class="logo-text">ZFLIX</span>
+    </div>
+    <button class="admin-btn" onclick="openAdmin()">+ Admin Panel</button>
+  </header>
+
+  <div class="container">
+    <h2>Trending Movies</h2>
+    <div class="grid" id="movieGrid"></div>
+  </div>
+
+  <!-- Player Modal -->
+  <div class="modal" id="playerModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closePlayer()">&times;</span>
+      <div id="iframeContainer"></div>
+    </div>
+  </div>
+
+  <!-- Admin Modal -->
+  <div class="admin-panel" id="adminPanel">
+    <div class="admin-box">
+      <span class="close-btn" onclick="closeAdmin()">&times;</span>
+      <h3>Movie Add Karein</h3>
+      <div class="input-group">
+        <label>Movie Name</label>
+        <input type="text" id="titleInput" placeholder="Movie title...">
+      </div>
+      <div class="input-group">
+        <label>ImgBB Direct Image URL</label>
+        <input type="text" id="posterInput" placeholder="https://i.ibb.co/...">
+      </div>
+      <div class="input-group">
+        <label>Streamtape Embed URL</label>
+        <input type="text" id="streamInput" placeholder="https://streamtape.com/e/...">
+      </div>
+      <button class="save-btn" onclick="addMovie()">Save Movie</button>
+    </div>
+  </div>
+
+  <script>
+    let movies = JSON.parse(localStorage.getItem('myMovies')) || [];
+
+    function renderMovies() {
+      const grid = document.getElementById('movieGrid');
+      grid.innerHTML = '';
+
+      if (movies.length === 0) {
+        grid.innerHTML = '<p style="color:#777;">Koi movie nahi hai. Admin panel se add karein.</p>';
+        return;
+      }
+
+      movies.forEach((movie, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <button class="del-btn" onclick="event.stopPropagation(); deleteMovie(${index})">X</button>
+          <img src="${movie.poster}" onclick="playVideo('${movie.streamUrl}')">
+          <div class="card-title">${movie.title}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function playVideo(url) {
+      let embedUrl = url;
+      if (url.includes('streamtape.com/v/')) {
+        embedUrl = url.replace('/v/', '/e/');
+      }
+      document.getElementById('iframeContainer').innerHTML = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
+      document.getElementById('playerModal').style.display = 'flex';
+    }
+
+    function closePlayer() {
+      document.getElementById('playerModal').style.display = 'none';
+      document.getElementById('iframeContainer').innerHTML = '';
+    }
+
+    function openAdmin() {
+      const password = prompt("Admin Password dalein:");
+      if (password === "1234") {
+        document.getElementById('adminPanel').style.display = 'flex';
+      } else if (password !== null) {
+        alert("Galat password!");
+      }
+    }
+
+    function closeAdmin() {
+      document.getElementById('adminPanel').style.display = 'none';
+    }
+
+    function addMovie() {
+      const title = document.getElementById('titleInput').value.trim();
+      const poster = document.getElementById('posterInput').value.trim();
+      const streamUrl = document.getElementById('streamInput').value.trim();
+
+      if (!title || !poster || !streamUrl) {
+        alert('Saare fields bharein!');
+        return;
+      }
+
+      movies.push({ title, poster, streamUrl });
+      localStorage.setItem('myMovies', JSON.stringify(movies));
+      renderMovies();
+
+      document.getElementById('titleInput').value = '';
+      document.getElementById('posterInput').value = '';
+      document.getElementById('streamInput').value = '';
+      closeAdmin();
+    }
+
+    function deleteMovie(index) {
+      if (confirm('Is movie ko delete karein?')) {
+        movies.splice(index, 1);
+        localStorage.setItem('myMovies', JSON.stringify(movies));
+        renderMovies();
+      }
+    }
+
+    renderMovies();
+  </script>
+</body>
+</html>
+
