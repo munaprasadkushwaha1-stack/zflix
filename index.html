@@ -6,61 +6,112 @@
   <title>ZFLIX - Free Movies & Web Series</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background-color: #141414; color: #fff; font-family: Arial, sans-serif; }
-    
-    /* Header */
-    header { display: flex; justify-content: space-between; align-items: center; padding: 15px 4%; background: #000; position: sticky; top: 0; z-index: 10; }
-    
-    /* Logo Styling */
-    .logo-container { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-    .logo-img { height: 35px; width: auto; object-fit: contain; }
-    .logo-text { color: #E50914; font-size: 28px; font-weight: 900; letter-spacing: 2px; font-family: 'Arial Black', Impact, sans-serif; text-transform: uppercase; }
-    
-    .admin-btn { background: #E50914; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-    
-    /* Movie Grid */
-    .container { padding: 30px 4%; }
-    h2 { margin-bottom: 20px; font-size: 20px; color: #e5e5e5; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-    .card { background: #222; border-radius: 4px; overflow: hidden; position: relative; transition: transform 0.2s; cursor: pointer; }
-    .card:hover { transform: scale(1.04); }
-    .card img { width: 100%; height: 230px; object-fit: cover; display: block; }
-    .card-title { padding: 10px; font-size: 13px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .del-btn { position: absolute; top: 5px; right: 5px; background: rgba(229, 9, 20, 0.8); color: #fff; border: none; padding: 3px 7px; border-radius: 3px; font-size: 10px; cursor: pointer; }
+    body { background-color: #0b0c10; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 40px; }
 
-    /* Video Player Modal */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; z-index: 100; }
-    .modal-content { background: #000; width: 90%; max-width: 800px; position: relative; border-radius: 8px; overflow: hidden; }
-    .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; color: #fff; z-index: 101; }
-    iframe { width: 100%; height: 450px; border: none; }
+    /* Header & Search */
+    header { display: flex; align-items: center; justify-content: space-between; padding: 15px 5%; background: rgba(11, 12, 16, 0.95); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px); }
+    .logo { color: #E50914; font-size: 24px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; font-family: 'Arial Black', Impact, sans-serif; }
+    .search-box { flex: 1; max-width: 450px; margin: 0 15px; }
+    .search-box input { width: 100%; padding: 10px 18px; border-radius: 25px; border: 1px solid #222630; background: #16181f; color: #fff; outline: none; font-size: 14px; }
+    .search-box input:focus { border-color: #E50914; }
 
-    /* Admin Panel Modal */
-    .admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 101; }
-    .admin-box { background: #181818; padding: 25px; border-radius: 8px; width: 90%; max-width: 400px; border: 1px solid #333; }
+    /* Hero Featured Slider */
+    .hero-container { position: relative; margin: 15px 5%; border-radius: 12px; overflow: hidden; background: #12141c; height: 280px; display: flex; align-items: flex-end; }
+    .hero-bg { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0.4; }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #0b0c10 10%, transparent 90%); }
+    .hero-content { position: relative; z-index: 2; padding: 25px; width: 100%; }
+    .badge { background: #E50914; color: #fff; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 8px; }
+    .hero-title { font-size: 24px; font-weight: bold; margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
+    .watch-btn { background: #E50914; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+    .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: #fff; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #333; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 3; }
+    .prev-btn { left: 15px; } .next-btn { right: 15px; }
+
+    /* Category Chips */
+    .filter-section { padding: 10px 5%; display: flex; flex-direction: column; gap: 10px; }
+    .chips-row { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
+    .chips-row::-webkit-scrollbar { display: none; }
+    .chip { background: #16181f; color: #aaa; border: 1px solid #222630; padding: 7px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+    .chip.active { background: #E50914; color: #fff; border-color: #E50914; }
+
+    /* Movie Section */
+    .main-container { padding: 20px 5%; }
+    .section-title { font-size: 18px; margin-bottom: 15px; }
+    .section-title span { color: #E50914; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+    .card { background: #16181f; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s; border: 1px solid #222630; }
+    .card:hover { transform: translateY(-4px); }
+    .card img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .card-title { padding: 8px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
+    .del-btn { position: absolute; top: 5px; right: 5px; background: rgba(229, 9, 20, 0.9); color: #fff; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px; cursor: pointer; z-index: 5; }
+
+    /* Footer */
+    footer { text-align: center; font-size: 12px; color: #555; margin-top: 40px; }
+    footer span { color: #E50914; }
+
+    /* Modals */
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 100; }
+    .modal-content { background: #000; width: 92%; max-width: 800px; position: relative; border-radius: 8px; overflow: hidden; }
+    .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #fff; z-index: 101; }
+    iframe { width: 100%; height: 420px; border: none; }
+
+    /* Admin Modal */
+    .admin-box { background: #16181f; padding: 25px; border-radius: 8px; width: 90%; max-width: 400px; border: 1px solid #222630; position: relative; }
     .admin-box h3 { margin-bottom: 15px; color: #E50914; }
     .input-group { margin-bottom: 12px; }
     .input-group label { display: block; font-size: 12px; margin-bottom: 5px; color: #aaa; }
-    .input-group input { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #333; background: #222; color: #fff; }
-    .save-btn { width: 100%; padding: 10px; background: #E50914; border: none; color: #fff; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+    .input-group input, .input-group select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #222630; background: #0b0c10; color: #fff; outline: none; }
+    .save-btn { width: 100%; padding: 10px; background: #E50914; border: none; color: #fff; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="logo-container" onclick="location.reload()">
-      <!-- Agar photo/image logo lagana ho toh niche wali line ka use karein -->
-      <!-- <img src="YOUR_LOGO_IMAGE_URL_HERE" alt="ZFLIX" class="logo-img"> -->
-      <span class="logo-text">ZFLIX</span>
+    <div class="logo">ZFLIX</div>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search movies..." oninput="handleSearch(this.value)">
     </div>
-    <button class="admin-btn" onclick="openAdmin()">+ Admin Panel</button>
   </header>
 
-  <div class="container">
-    <h2>Trending Movies</h2>
+  <!-- Featured Slider -->
+  <div class="hero-container">
+    <div class="nav-arrow prev-btn" onclick="prevSlide()">&lt;</div>
+    <div class="nav-arrow next-btn" onclick="nextSlide()">&gt;</div>
+    <img id="heroImg" class="hero-bg" src="" alt="">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="badge">Featured</span>
+      <div class="hero-title" id="heroTitle">Loading...</div>
+      <button class="watch-btn" id="heroWatchBtn">▶ Watch Now</button>
+    </div>
+  </div>
+
+  <!-- Category & Genre Chips -->
+  <div class="filter-section">
+    <div class="chips-row">
+      <div class="chip active" onclick="filterCategory('All', this)">All</div>
+      <div class="chip" onclick="filterCategory('Bollywood', this)">Bollywood</div>
+      <div class="chip" onclick="filterCategory('Hollywood', this)">Hollywood</div>
+      <div class="chip" onclick="filterCategory('Hindi Dubbed', this)">Hindi Dubbed</div>
+    </div>
+    <div class="chips-row">
+      <div class="chip active" onclick="filterGenre('All', this)">All Genres</div>
+      <div class="chip" onclick="filterGenre('Action', this)">Action</div>
+      <div class="chip" onclick="filterGenre('Adventure', this)">Adventure</div>
+      <div class="chip" onclick="filterGenre('Animation', this)">Animation</div>
+    </div>
+  </div>
+
+  <!-- Movie Grid -->
+  <div class="main-container">
+    <div class="section-title">All <span>Movies</span></div>
     <div class="grid" id="movieGrid"></div>
   </div>
 
-  <!-- Player Modal -->
+  <footer>
+    2026 <span>ZFLIX</span> — All rights reserved
+  </footer>
+
+  <!-- Video Player Modal -->
   <div class="modal" id="playerModal">
     <div class="modal-content">
       <span class="close-btn" onclick="closePlayer()">&times;</span>
@@ -68,21 +119,37 @@
     </div>
   </div>
 
-  <!-- Admin Modal -->
-  <div class="admin-panel" id="adminPanel">
+  <!-- Hidden Admin Panel Modal -->
+  <div class="modal" id="adminPanel">
     <div class="admin-box">
       <span class="close-btn" onclick="closeAdmin()">&times;</span>
-      <h3>Movie Add Karein</h3>
+      <h3>Admin Panel</h3>
       <div class="input-group">
-        <label>Movie Name</label>
-        <input type="text" id="titleInput" placeholder="Movie title...">
+        <label>Movie Title</label>
+        <input type="text" id="titleInput" placeholder="Enter title...">
       </div>
       <div class="input-group">
-        <label>ImgBB Direct Image URL</label>
+        <label>Category</label>
+        <select id="catInput">
+          <option value="Bollywood">Bollywood</option>
+          <option value="Hollywood">Hollywood</option>
+          <option value="Hindi Dubbed">Hindi Dubbed</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Genre</label>
+        <select id="genreInput">
+          <option value="Action">Action</option>
+          <option value="Adventure">Adventure</option>
+          <option value="Animation">Animation</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>ImgBB Poster Link</label>
         <input type="text" id="posterInput" placeholder="https://i.ibb.co/...">
       </div>
       <div class="input-group">
-        <label>Streamtape Embed URL</label>
+        <label>Streamtape Embed Link</label>
         <input type="text" id="streamInput" placeholder="https://streamtape.com/e/...">
       </div>
       <button class="save-btn" onclick="addMovie()">Save Movie</button>
@@ -90,34 +157,88 @@
   </div>
 
   <script>
-    let movies = JSON.parse(localStorage.getItem('myMovies')) || [];
+    let movies = JSON.parse(localStorage.getItem('zflix_movies')) || [];
+    let currentSlide = 0;
+    let selectedCategory = 'All';
+    let selectedGenre = 'All';
 
-    function renderMovies() {
+    // Secret Admin Trigger (Type 5 times 'x' in search box)
+    function handleSearch(val) {
+      if (val.toLowerCase() === 'xxxxx') {
+        document.getElementById('searchInput').value = '';
+        const pwd = prompt("Enter Admin Password:");
+        if (pwd === "1234") {
+          document.getElementById('adminPanel').style.display = 'flex';
+        } else if (pwd !== null) {
+          alert("Incorrect Password!");
+        }
+        renderGrid();
+        return;
+      }
+      renderGrid();
+    }
+
+    function renderHero() {
+      if (movies.length === 0) {
+        document.getElementById('heroTitle').innerText = 'No Movies Added';
+        document.getElementById('heroImg').src = '';
+        return;
+      }
+      const m = movies[currentSlide % movies.length];
+      document.getElementById('heroTitle').innerText = m.title;
+      document.getElementById('heroImg').src = m.poster;
+      document.getElementById('heroWatchBtn').onclick = () => playVideo(m.streamUrl);
+    }
+
+    function prevSlide() { if(movies.length) { currentSlide = (currentSlide - 1 + movies.length) % movies.length; renderHero(); } }
+    function nextSlide() { if(movies.length) { currentSlide = (currentSlide + 1) % movies.length; renderHero(); } }
+
+    function renderGrid() {
       const grid = document.getElementById('movieGrid');
+      const searchQuery = document.getElementById('searchInput').value.toLowerCase();
       grid.innerHTML = '';
 
-      if (movies.length === 0) {
-        grid.innerHTML = '<p style="color:#777;">Koi movie nahi hai. Admin panel se add karein.</p>';
+      const filtered = movies.filter(m => {
+        const matchesCat = (selectedCategory === 'All' || m.category === selectedCategory);
+        const matchesGenre = (selectedGenre === 'All' || m.genre === selectedGenre);
+        const matchesSearch = m.title.toLowerCase().includes(searchQuery);
+        return matchesCat && matchesGenre && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<p style="color:#555; grid-column: 1/-1;">Koi movie nahi hai. Admin panel se add karein.</p>';
         return;
       }
 
-      movies.forEach((movie, index) => {
+      filtered.forEach((m, idx) => {
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-          <button class="del-btn" onclick="event.stopPropagation(); deleteMovie(${index})">X</button>
-          <img src="${movie.poster}" onclick="playVideo('${movie.streamUrl}')">
-          <div class="card-title">${movie.title}</div>
+          <button class="del-btn" onclick="event.stopPropagation(); deleteMovie(${idx})">X</button>
+          <img src="${m.poster}" onclick="playVideo('${m.streamUrl}')">
+          <div class="card-title">${m.title}</div>
         `;
         grid.appendChild(card);
       });
     }
 
+    function filterCategory(cat, el) {
+      selectedCategory = cat;
+      el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      renderGrid();
+    }
+
+    function filterGenre(gen, el) {
+      selectedGenre = gen;
+      el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      renderGrid();
+    }
+
     function playVideo(url) {
       let embedUrl = url;
-      if (url.includes('streamtape.com/v/')) {
-        embedUrl = url.replace('/v/', '/e/');
-      }
+      if (url.includes('streamtape.com/v/')) embedUrl = url.replace('/v/', '/e/');
       document.getElementById('iframeContainer').innerHTML = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
       document.getElementById('playerModal').style.display = 'flex';
     }
@@ -127,49 +248,40 @@
       document.getElementById('iframeContainer').innerHTML = '';
     }
 
-    function openAdmin() {
-      const password = prompt("Admin Password dalein:");
-      if (password === "1234") {
-        document.getElementById('adminPanel').style.display = 'flex';
-      } else if (password !== null) {
-        alert("Galat password!");
-      }
-    }
-
-    function closeAdmin() {
-      document.getElementById('adminPanel').style.display = 'none';
-    }
+    function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
 
     function addMovie() {
       const title = document.getElementById('titleInput').value.trim();
+      const category = document.getElementById('catInput').value;
+      const genre = document.getElementById('genreInput').value;
       const poster = document.getElementById('posterInput').value.trim();
       const streamUrl = document.getElementById('streamInput').value.trim();
 
-      if (!title || !poster || !streamUrl) {
-        alert('Saare fields bharein!');
-        return;
-      }
+      if (!title || !poster || !streamUrl) { alert('Saare fields bharein!'); return; }
 
-      movies.push({ title, poster, streamUrl });
-      localStorage.setItem('myMovies', JSON.stringify(movies));
-      renderMovies();
+      movies.push({ title, category, genre, poster, streamUrl });
+      localStorage.setItem('zflix_movies', JSON.stringify(movies));
 
       document.getElementById('titleInput').value = '';
       document.getElementById('posterInput').value = '';
       document.getElementById('streamInput').value = '';
       closeAdmin();
+      renderHero();
+      renderGrid();
     }
 
-    function deleteMovie(index) {
+    function deleteMovie(idx) {
       if (confirm('Is movie ko delete karein?')) {
-        movies.splice(index, 1);
-        localStorage.setItem('myMovies', JSON.stringify(movies));
-        renderMovies();
+        movies.splice(idx, 1);
+        localStorage.setItem('zflix_movies', JSON.stringify(movies));
+        renderHero();
+        renderGrid();
       }
     }
 
-    renderMovies();
+    // Init
+    renderHero();
+    renderGrid();
   </script>
 </body>
 </html>
-
