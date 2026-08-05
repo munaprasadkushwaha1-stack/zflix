@@ -1,198 +1,594 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Video Player</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background: #0f172a;
-            color: #f8fafc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .player-container {
-            width: 100%;
-            max-width: 800px;
-            background: #1e293b;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-            border: 1px solid #334155;
-        }
-        .video-box {
-            position: relative;
-            width: 100%;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
-            background: #000;
-        }
-        .video-box iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        .controls-section {
-            padding: 20px;
-        }
-        .server-title {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #94a3b8;
-        }
-        .server-buttons {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .server-btn {
-            flex: 1;
-            padding: 12px 16px;
-            background: #334155;
-            color: #cbd5e1;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .server-btn:hover {
-            background: #475569;
-            color: #fff;
-        }
-        .server-btn.active {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-        }
-        .input-group {
-            display: flex;
-            gap: 10px;
-        }
-        .input-group input {
-            flex: 1;
-            padding: 12px 16px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        .input-group input:focus {
-            border-color: #3b82f6;
-        }
-        .input-group button {
-            padding: 12px 20px;
-            background: #10b981;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .input-group button:hover {
-            background: #059669;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZFLIX - Movies & Web Series</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: #0b0c10; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 40px; }
+
+    /* Header & Search */
+    header { display: flex; align-items: center; justify-content: space-between; padding: 15px 5%; background: rgba(11, 12, 16, 0.95); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px); }
+    .logo { color: #E50914; font-size: 24px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; font-family: 'Arial Black', Impact, sans-serif; }
+    .search-box { flex: 1; max-width: 450px; margin: 0 15px; }
+    .search-box input { width: 100%; padding: 10px 18px; border-radius: 25px; border: 1px solid #222630; background: #16181f; color: #fff; outline: none; font-size: 14px; }
+    .search-box input:focus { border-color: #E50914; }
+
+    /* Hero Featured Slider */
+    .hero-container { position: relative; margin: 15px 5%; border-radius: 12px; overflow: hidden; background: #12141c; height: 280px; display: flex; align-items: flex-end; }
+    .hero-bg { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0.4; }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #0b0c10 10%, transparent 90%); }
+    .hero-content { position: relative; z-index: 2; padding: 25px; width: 100%; }
+    .badge-group { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .badge { background: #E50914; color: #fff; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; }
+    .imdb-badge { background: #f5c518; color: #000; font-weight: 900; font-size: 11px; padding: 3px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px; }
+    .hero-title { font-size: 24px; font-weight: bold; margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
+    .watch-btn { background: #E50914; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+    .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: #fff; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #333; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 3; }
+    .prev-btn { left: 15px; } .next-btn { right: 15px; }
+
+    /* Category & Genre Chips */
+    .filter-section { padding: 10px 5%; display: flex; flex-direction: column; gap: 10px; }
+    .chips-row { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
+    .chips-row::-webkit-scrollbar { display: none; }
+    .chip { background: #16181f; color: #aaa; border: 1px solid #222630; padding: 7px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+    .chip.active { background: #E50914; color: #fff; border-color: #E50914; }
+
+    /* Movie Grid */
+    .main-container { padding: 20px 5%; }
+    .section-title { font-size: 18px; margin-bottom: 15px; }
+    .section-title span { color: #E50914; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+    .card { background: #16181f; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s; border: 1px solid #222630; }
+    .card:hover { transform: translateY(-4px); }
+    .card-img-wrapper { position: relative; width: 100%; height: 200px; background: #1a1d26; }
+    .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card-imdb { position: absolute; top: 5px; left: 5px; background: rgba(245, 197, 24, 0.95); color: #000; font-weight: 900; font-size: 10px; padding: 2px 6px; border-radius: 3px; z-index: 4; }
+    .card-title { padding: 8px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
+
+    /* Footer */
+    footer { text-align: center; font-size: 12px; color: #555; margin-top: 40px; }
+    footer span { color: #E50914; }
+
+    /* Modals */
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); justify-content: center; align-items: center; z-index: 100; padding: 15px; }
+    .modal-content { background: #12141c; width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; position: relative; border-radius: 12px; border: 1px solid #222630; padding-bottom: 20px; }
+    .close-btn { position: sticky; top: 10px; left: 95%; font-size: 28px; cursor: pointer; color: #fff; z-index: 101; background: rgba(0,0,0,0.7); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    
+    .video-frame { width: 100%; height: 380px; border: none; background: #000; }
+
+    /* Server Switch Buttons */
+    .server-switch-box { display: flex; gap: 10px; padding: 12px 20px; background: #16181f; border-bottom: 1px solid #222630; align-items: center; }
+    .server-btn { flex: 1; padding: 10px 14px; background: #0b0c10; color: #aaa; border: 1px solid #222630; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; text-align: center; transition: 0.3s; }
+    .server-btn.active { background: #E50914; color: #fff; border-color: #E50914; }
+
+    /* Movie Detail Info Under Video */
+    .movie-detail-body { padding: 20px; }
+    .detail-title { font-size: 22px; font-weight: bold; margin-bottom: 8px; }
+    .detail-badges { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+    .info-box { background: #16181f; padding: 12px; border-radius: 8px; margin-top: 10px; border: 1px solid #222630; }
+    .info-label { color: #E50914; font-weight: bold; font-size: 13px; margin-bottom: 4px; }
+    .info-text { color: #ccc; font-size: 13px; line-height: 1.5; }
+    .trailer-frame { width: 100%; height: 220px; border: none; margin-top: 8px; border-radius: 6px; }
+
+    /* Admin Modal */
+    .admin-box { background: #16181f; padding: 20px; border-radius: 12px; width: 100%; max-width: 500px; border: 1px solid #222630; position: relative; max-height: 90vh; overflow-y: auto; }
+    .admin-box h3 { margin-bottom: 15px; color: #E50914; border-bottom: 1px solid #222630; padding-bottom: 8px; }
+    .input-group { margin-bottom: 10px; }
+    .input-group label { display: block; font-size: 11px; margin-bottom: 4px; color: #aaa; text-transform: uppercase; }
+    .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 8px 12px; border-radius: 5px; border: 1px solid #222630; background: #0b0c10; color: #fff; outline: none; font-size: 13px; }
+    .fetch-box { display: flex; gap: 8px; }
+    .fetch-btn { background: #2563eb; color: #fff; border: none; padding: 0 15px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 12px; white-space: nowrap; }
+    .save-btn { width: 100%; padding: 10px; background: #E50914; border: none; color: #fff; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    
+    .admin-list { margin-top: 20px; border-top: 1px solid #222630; padding-top: 15px; }
+    .admin-item { display: flex; justify-content: space-between; align-items: center; background: #0b0c10; padding: 8px 12px; border-radius: 6px; margin-bottom: 6px; font-size: 13px; }
+    .admin-actions { display: flex; gap: 6px; }
+    .btn-sm { border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; color: #fff; font-weight: bold; }
+    .btn-edit { background: #f59e0b; }
+    .btn-del { background: #E50914; }
+  </style>
 </head>
 <body>
 
-<div class="player-container">
-    <!-- Video Box -->
-    <div class="video-box">
-        <iframe id="videoIframe" src="" allowfullscreen></iframe>
+  <header>
+    <div class="logo">ZFLIX</div>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search movies..." oninput="handleSearch(this.value)">
     </div>
+  </header>
 
-    <!-- Controls & Servers -->
-    <div class="controls-section">
-        <div class="server-title">⚡ Server Choose Karein:</div>
-        <div class="server-buttons">
-            <button class="server-btn active" onclick="switchServer('okru', this)">
-                🌐 Server 1 (Ok.ru)
-            </button>
-            <button class="server-btn" onclick="switchServer('streamtape', this)">
-                📼 Server 2 (Streamtape)
-            </button>
+  <!-- Featured Slider -->
+  <div class="hero-container">
+    <div class="nav-arrow prev-btn" onclick="prevSlide()">&lt;</div>
+    <div class="nav-arrow next-btn" onclick="nextSlide()">&gt;</div>
+    <img id="heroImg" class="hero-bg" src="" alt="" onerror="this.src='https://placehold.co/600x400/16181f/fff?text=No+Poster'">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="badge-group">
+        <span class="badge">Featured</span>
+        <span class="imdb-badge" id="heroImdb">⭐ IMDb --</span>
+      </div>
+      <div class="hero-title" id="heroTitle">Loading...</div>
+      <button class="watch-btn" id="heroWatchBtn">▶ Watch Now</button>
+    </div>
+  </div>
+
+  <!-- Category & Genre Chips -->
+  <div class="filter-section">
+    <div class="chips-row">
+      <div class="chip active" onclick="filterCategory('All', this)">All</div>
+      <div class="chip" onclick="filterCategory('Bollywood', this)">Bollywood</div>
+      <div class="chip" onclick="filterCategory('Hollywood', this)">Hollywood</div>
+      <div class="chip" onclick="filterCategory('Hindi Dubbed', this)">Hindi Dubbed</div>
+    </div>
+    <div class="chips-row">
+      <div class="chip active" onclick="filterGenre('All', this)">All Genres</div>
+      <div class="chip" onclick="filterGenre('Action', this)">Action</div>
+      <div class="chip" onclick="filterGenre('Adventure', this)">Adventure</div>
+      <div class="chip" onclick="filterGenre('Animation', this)">Animation</div>
+    </div>
+  </div>
+
+  <!-- Movie Grid -->
+  <div class="main-container">
+    <div class="section-title">All <span>Movies</span></div>
+    <div class="grid" id="movieGrid"></div>
+  </div>
+
+  <footer>
+    2026 <span>ZFLIX</span> — All rights reserved
+  </footer>
+
+  <!-- Video Player Modal -->
+  <div class="modal" id="playerModal">
+    <div class="modal-content">
+      <div class="close-btn" onclick="closePlayer()">&times;</div>
+      
+      <!-- Video Player Frame -->
+      <div id="iframeContainer"></div>
+
+      <!-- Server Switch Buttons (Ok.ru is Server 1, Streamtape is Server 2) -->
+      <div class="server-switch-box">
+        <span style="font-size:12px; color:#aaa; font-weight:bold;">SERVERS:</span>
+        <button class="server-btn active" id="btnServer1" onclick="switchServer(1)">🌐 Server 1 (Ok.ru)</button>
+        <button class="server-btn" id="btnServer2" onclick="switchServer(2)">📼 Server 2 (Streamtape)</button>
+      </div>
+      
+      <!-- Movie Details -->
+      <div class="movie-detail-body">
+        <div class="detail-title" id="mDetailTitle">--</div>
+        <div class="detail-badges">
+          <span class="imdb-badge" id="mDetailImdb">⭐ IMDb --</span>
+          <span class="badge" id="mDetailCat">--</span>
+          <span class="badge" style="background:#333;" id="mDetailGenre">--</span>
         </div>
 
-        <div class="input-group">
-            <input type="text" id="videoUrlInput" placeholder="Ok.ru ka link ya embed code daalein...">
-            <button onclick="loadVideo()">Play Karein</button>
+        <div class="info-box">
+          <div class="info-label">👥 ACTORS / CAST</div>
+          <div class="info-text" id="mDetailCast">Not available</div>
         </div>
+
+        <div class="info-box">
+          <div class="info-label">📝 STORYLINE / DESCRIPTION</div>
+          <div class="info-text" id="mDetailDesc">No description available.</div>
+        </div>
+
+        <div class="info-box" id="trailerBox">
+          <div class="info-label">🎬 OFFICIAL TRAILER</div>
+          <div id="trailerContainer"></div>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<script>
-    let currentServer = 'okru';
+  <!-- Admin Panel Modal -->
+  <div class="modal" id="adminPanel">
+    <div class="admin-box">
+      <div class="close-btn" onclick="closeAdmin()">&times;</div>
+      <h3 id="adminModalTitle">Add New Movie</h3>
+      
+      <!-- AUTOMATIC IMDB FETCH BOX -->
+      <div class="input-group" style="background: #0b0c10; padding: 10px; border-radius: 6px; border: 1px solid #222630;">
+        <label style="color:#2563eb; font-weight:bold;">AUTO-FILL WITH IMDB ID</label>
+        <div class="fetch-box">
+          <input type="text" id="imdbIdInput" placeholder="Enter IMDb ID (e.g. tt1375666)">
+          <button type="button" class="fetch-btn" onclick="fetchImdbData()">Fetch Data</button>
+        </div>
+      </div>
 
-    function switchServer(server, btn) {
-        currentServer = server;
-        document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        const input = document.getElementById('videoUrlInput');
-        if(server === 'okru') {
-            input.placeholder = "Ok.ru ka link ya embed code daalein...";
+      <div class="input-group">
+        <label>Movie Title</label>
+        <input type="text" id="titleInput" placeholder="Enter title...">
+      </div>
+      <div class="input-group">
+        <label>IMDb Rating (e.g. 8.2)</label>
+        <input type="text" id="imdbInput" placeholder="8.2">
+      </div>
+      <div class="input-group">
+        <label>Category & Genre</label>
+        <div style="display:flex; gap:10px;">
+          <select id="catInput">
+            <option value="Bollywood">Bollywood</option>
+            <option value="Hollywood">Hollywood</option>
+            <option value="Hindi Dubbed">Hindi Dubbed</option>
+          </select>
+          <select id="genreInput">
+            <option value="Action">Action</option>
+            <option value="Adventure">Adventure</option>
+            <option value="Animation">Animation</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Actors / Cast</label>
+        <input type="text" id="castInput" placeholder="Shah Rukh Khan, Deepika Padukone...">
+      </div>
+      <div class="input-group">
+        <label>Storyline / Description</label>
+        <textarea id="descInput" rows="2" placeholder="Short story of the movie..."></textarea>
+      </div>
+      <div class="input-group">
+        <label>Poster Link</label>
+        <input type="text" id="posterInput" placeholder="https://i.ibb.co/...">
+      </div>
+      
+      <!-- VIDEO LINKS (Ok.ru is Server 1, Streamtape is Server 2) -->
+      <div class="input-group">
+        <label style="color:#3b82f6;">Ok.ru Link / Embed Code (Server 1)</label>
+        <input type="text" id="okruInput" placeholder="https://ok.ru/videoembed/... ya iframe code">
+      </div>
+      <div class="input-group">
+        <label style="color:#f59e0b;">Streamtape Link / Embed Code (Server 2)</label>
+        <input type="text" id="streamInput" placeholder="https://streamtape.com/e/... ya iframe code">
+      </div>
+
+      <div class="input-group">
+        <label>YouTube Trailer Link</label>
+        <input type="text" id="trailerInput" placeholder="https://www.youtube.com/embed/...">
+      </div>
+      
+      <button class="save-btn" onclick="saveMovie()">Save Movie</button>
+
+      <!-- Manage Existing Movies -->
+      <div class="admin-list">
+        <h4 style="color:#aaa; margin-bottom:10px; font-size:13px;">Manage Existing Movies (Edit / Delete)</h4>
+        <div id="adminMovieList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let movies = JSON.parse(localStorage.getItem('zflix_movies')) || [];
+    let currentSlide = 0;
+    let selectedCategory = 'All';
+    let selectedGenre = 'All';
+    let editIndex = -1;
+    let activeMovieObj = null;
+
+    // Admin Access via Search ('xxxxx')
+    function handleSearch(val) {
+      if (val.toLowerCase() === 'xxxxx') {
+        document.getElementById('searchInput').value = '';
+        const pwd = prompt("Enter Admin Password:");
+        if (pwd === "1234") {
+          openAdminPanel();
+        } else if (pwd !== null) {
+          alert("Incorrect Password!");
+        }
+        renderGrid();
+        return;
+      }
+      renderGrid();
+    }
+
+    // IMDb Auto-Fetch
+    async function fetchImdbData() {
+      const imdbId = document.getElementById('imdbIdInput').value.trim();
+      if (!imdbId) {
+        alert('Kripya IMDb ID bharein! (Jaise: tt1375666)');
+        return;
+      }
+      const cleanId = imdbId.startsWith('tt') ? imdbId : 'tt' + imdbId;
+
+      try {
+        const response = await fetch(`https://www.omdbapi.com/?i=${cleanId}&apikey=trilogy`);
+        const data = await response.json();
+
+        if (data.Response === 'True') {
+          document.getElementById('titleInput').value = data.Title || '';
+          document.getElementById('imdbInput').value = data.imdbRating !== 'N/A' ? data.imdbRating : '';
+          document.getElementById('castInput').value = data.Actors !== 'N/A' ? data.Actors : '';
+          document.getElementById('descInput').value = data.Plot !== 'N/A' ? data.Plot : '';
+          document.getElementById('posterInput').value = data.Poster !== 'N/A' ? data.Poster : '';
+          alert('Details automatically fetch ho gayi hain!');
         } else {
-            input.placeholder = "Streamtape ka link ya embed code daalein...";
+          alert('Movie nahi mili! IMDb ID check karein.');
         }
+      } catch (err) {
+        alert('Data fetch karne me error aaya.');
+      }
     }
 
-    function loadVideo() {
-        const rawInput = document.getElementById('videoUrlInput').value.trim();
-        const iframe = document.getElementById('videoIframe');
-
-        if (!rawInput) {
-            alert('Pehle koi valid link ya code enter karein!');
-            return;
-        }
-
-        let embedUrl = '';
-
-        if (currentServer === 'okru') {
-            if (rawInput.includes('<iframe')) {
-                const match = rawInput.match(/src="([^"]+)"/);
-                embedUrl = match ? match[1] : rawInput;
-            } else if (rawInput.includes('ok.ru')) {
-                embedUrl = rawInput.replace('/video/', '/videoembed/');
-            } else {
-                embedUrl = `https://ok.ru/videoembed/${rawInput}`;
-            }
-        } else if (currentServer === 'streamtape') {
-            if (rawInput.includes('<iframe')) {
-                const match = rawInput.match(/src="([^"]+)"/);
-                embedUrl = match ? match[1] : rawInput;
-            } else if (rawInput.includes('streamtape.com')) {
-                embedUrl = rawInput.replace('/v/', '/e/');
-            } else {
-                embedUrl = `https://streamtape.com/e/${rawInput}`;
-            }
-        }
-
-        iframe.src = embedUrl;
+    function openAdminPanel() {
+      editIndex = -1;
+      document.getElementById('adminModalTitle').innerText = "Add New Movie";
+      resetAdminForm();
+      renderAdminList();
+      document.getElementById('adminPanel').style.display = 'flex';
     }
-</script>
 
+    function resetAdminForm() {
+      document.getElementById('imdbIdInput').value = '';
+      document.getElementById('titleInput').value = '';
+      document.getElementById('imdbInput').value = '';
+      document.getElementById('castInput').value = '';
+      document.getElementById('descInput').value = '';
+      document.getElementById('posterInput').value = '';
+      document.getElementById('okruInput').value = '';
+      document.getElementById('streamInput').value = '';
+      document.getElementById('trailerInput').value = '';
+    }
+
+    // Embed URL Cleaners for Ok.ru & Streamtape
+    function fixOkruUrl(url) {
+      if (!url) return '';
+      url = url.trim();
+
+      // Extract src if full iframe is passed
+      if (url.includes('<iframe')) {
+        const match = url.match(/src=["']([^"']+)["']/);
+        if (match && match[1]) url = match[1];
+      }
+
+      // Convert regular ok.ru/video/ to ok.ru/videoembed/
+      if (url.includes('ok.ru/video/') && !url.includes('videoembed')) {
+        url = url.replace('/video/', '/videoembed/');
+      }
+      
+      if (!url.startsWith('http://') && !url.startsWith('https://') && url.length > 5) {
+        url = 'https://ok.ru/videoembed/' + url;
+      }
+
+      return url;
+    }
+
+    function fixStreamtapeUrl(url) {
+      if (!url) return '';
+      url = url.trim();
+
+      if (url.includes('<iframe')) {
+        const match = url.match(/src=["']([^"']+)["']/);
+        if (match && match[1]) url = match[1];
+      }
+
+      if (url.includes('streamtape.com/v/')) {
+        url = url.replace('/v/', '/e/');
+      }
+
+      return url;
+    }
+
+    function fixYoutubeLink(url) {
+      if (!url) return '';
+      url = url.trim();
+
+      if (url.includes('<iframe')) {
+        const match = url.match(/src=["']([^"']+)["']/);
+        if (match && match[1]) url = match[1];
+      }
+
+      if (url.includes('watch?v=')) return url.replace('watch?v=', 'embed/');
+      if (url.includes('youtu.be/')) return url.replace('youtu.be/', 'youtube.com/embed/');
+      return url;
+    }
+
+    function renderHero() {
+      if (movies.length === 0) {
+        document.getElementById('heroTitle').innerText = 'No Movies Added';
+        document.getElementById('heroImg').src = '';
+        document.getElementById('heroImdb').innerText = '⭐ IMDb N/A';
+        return;
+      }
+      const m = movies[currentSlide % movies.length];
+      document.getElementById('heroTitle').innerText = m.title;
+      document.getElementById('heroImg').src = m.poster || 'https://placehold.co/600x400/16181f/fff?text=No+Poster';
+      document.getElementById('heroImdb').innerText = `⭐ IMDb ${m.imdb || 'N/A'}`;
+      document.getElementById('heroWatchBtn').onclick = () => playMovie(currentSlide % movies.length);
+    }
+
+    function prevSlide() { if(movies.length) { currentSlide = (currentSlide - 1 + movies.length) % movies.length; renderHero(); } }
+    function nextSlide() { if(movies.length) { currentSlide = (currentSlide + 1) % movies.length; renderHero(); } }
+
+    function renderGrid() {
+      const grid = document.getElementById('movieGrid');
+      const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+      grid.innerHTML = '';
+
+      const filtered = movies.filter(m => {
+        const matchesCat = (selectedCategory === 'All' || m.category === selectedCategory);
+        const matchesGenre = (selectedGenre === 'All' || m.genre === selectedGenre);
+        const matchesSearch = m.title.toLowerCase().includes(searchQuery);
+        return matchesCat && matchesGenre && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<p style="color:#555; grid-column: 1/-1;">Koi movie nahi hai.</p>';
+        return;
+      }
+
+      filtered.forEach((m) => {
+        const originalIndex = movies.indexOf(m);
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.onclick = () => playMovie(originalIndex);
+        card.innerHTML = `
+          <div class="card-img-wrapper">
+            <span class="card-imdb">⭐ ${m.imdb || 'N/A'}</span>
+            <img src="${m.poster}" onerror="this.src='https://placehold.co/300x450/16181f/fff?text=No+Poster'">
+          </div>
+          <div class="card-title">${m.title}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function playMovie(idx) {
+      activeMovieObj = movies[idx];
+      if (!activeMovieObj) return;
+
+      switchServer(1); // Default Server 1 (Ok.ru)
+
+      document.getElementById('mDetailTitle').innerText = activeMovieObj.title;
+      document.getElementById('mDetailImdb').innerText = `⭐ IMDb ${activeMovieObj.imdb || 'N/A'}`;
+      document.getElementById('mDetailCat').innerText = activeMovieObj.category || 'All';
+      document.getElementById('mDetailGenre').innerText = activeMovieObj.genre || 'General';
+      document.getElementById('mDetailCast').innerText = activeMovieObj.cast || 'Actors detail not added.';
+      document.getElementById('mDetailDesc').innerText = activeMovieObj.desc || 'No storyline provided.';
+
+      if (activeMovieObj.trailerUrl) {
+        document.getElementById('trailerBox').style.display = 'block';
+        document.getElementById('trailerContainer').innerHTML = `<iframe class="trailer-frame" src="${fixYoutubeLink(activeMovieObj.trailerUrl)}" allowfullscreen></iframe>`;
+      } else {
+        document.getElementById('trailerBox').style.display = 'none';
+        document.getElementById('trailerContainer').innerHTML = '';
+      }
+
+      document.getElementById('playerModal').style.display = 'flex';
+    }
+
+    function switchServer(serverNum) {
+      if (!activeMovieObj) return;
+
+      const btn1 = document.getElementById('btnServer1');
+      const btn2 = document.getElementById('btnServer2');
+
+      let targetUrl = '';
+      if (serverNum === 1) {
+        // Ok.ru
+        targetUrl = fixOkruUrl(activeMovieObj.okruUrl || activeMovieObj.streamUrl);
+        btn1.classList.add('active');
+        btn2.classList.remove('active');
+      } else {
+        // Streamtape
+        targetUrl = fixStreamtapeUrl(activeMovieObj.streamUrl);
+        btn2.classList.add('active');
+        btn1.classList.remove('active');
+      }
+
+      if (targetUrl) {
+        document.getElementById('iframeContainer').innerHTML = `<iframe class="video-frame" src="${targetUrl}" allowfullscreen></iframe>`;
+      } else {
+        document.getElementById('iframeContainer').innerHTML = `<div style="padding:40px; text-align:center; color:#888;">Is server ka link available nahi hai.</div>`;
+      }
+    }
+
+    function filterCategory(cat, el) {
+      selectedCategory = cat;
+      el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      renderGrid();
+    }
+
+    function filterGenre(gen, el) {
+      selectedGenre = gen;
+      el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      renderGrid();
+    }
+
+    function closePlayer() {
+      document.getElementById('playerModal').style.display = 'none';
+      document.getElementById('iframeContainer').innerHTML = '';
+      document.getElementById('trailerContainer').innerHTML = '';
+    }
+
+    function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
+
+    function renderAdminList() {
+      const listContainer = document.getElementById('adminMovieList');
+      listContainer.innerHTML = '';
+      if (movies.length === 0) {
+        listContainer.innerHTML = '<p style="color:#666; font-size:12px;">No movies found.</p>';
+        return;
+      }
+      movies.forEach((m, idx) => {
+        const item = document.createElement('div');
+        item.className = 'admin-item';
+        item.innerHTML = `
+          <span>${m.title}</span>
+          <div class="admin-actions">
+            <button class="btn-sm btn-edit" onclick="editMovie(${idx})">Edit</button>
+            <button class="btn-sm btn-del" onclick="deleteMovie(${idx})">Delete</button>
+          </div>
+        `;
+        listContainer.appendChild(item);
+      });
+    }
+
+    function editMovie(idx) {
+      editIndex = idx;
+      const m = movies[idx];
+      document.getElementById('adminModalTitle').innerText = "Edit Movie";
+      document.getElementById('titleInput').value = m.title || '';
+      document.getElementById('imdbInput').value = m.imdb || '';
+      document.getElementById('catInput').value = m.category || 'Bollywood';
+      document.getElementById('genreInput').value = m.genre || 'Action';
+      document.getElementById('castInput').value = m.cast || '';
+      document.getElementById('descInput').value = m.desc || '';
+      document.getElementById('posterInput').value = m.poster || '';
+      document.getElementById('okruInput').value = m.okruUrl || '';
+      document.getElementById('streamInput').value = m.streamUrl || '';
+      document.getElementById('trailerInput').value = m.trailerUrl || '';
+    }
+
+    function saveMovie() {
+      const title = document.getElementById('titleInput').value.trim();
+      const imdb = document.getElementById('imdbInput').value.trim();
+      const category = document.getElementById('catInput').value;
+      const genre = document.getElementById('genreInput').value;
+      const cast = document.getElementById('castInput').value.trim();
+      const desc = document.getElementById('descInput').value.trim();
+      const poster = document.getElementById('posterInput').value.trim();
+      const okruUrl = fixOkruUrl(document.getElementById('okruInput').value);
+      const streamUrl = fixStreamtapeUrl(document.getElementById('streamInput').value);
+      const trailerUrl = fixYoutubeLink(document.getElementById('trailerInput').value);
+
+      if (!title || !poster) { alert('Movie Title aur Poster Link zaroori hai!'); return; }
+
+      const movieData = { title, imdb, category, genre, cast, desc, poster, okruUrl, streamUrl, trailerUrl };
+
+      if (editIndex >= 0) {
+        movies[editIndex] = movieData;
+      } else {
+        movies.push(movieData);
+      }
+
+      localStorage.setItem('zflix_movies', JSON.stringify(movies));
+      resetAdminForm();
+      editIndex = -1;
+      document.getElementById('adminModalTitle').innerText = "Add New Movie";
+      renderAdminList();
+      renderHero();
+      renderGrid();
+      alert('Movie successfully save ho gayi!');
+    }
+
+    function deleteMovie(idx) {
+      if (confirm('Kya aap is movie ko delete karna chahte hain?')) {
+        movies.splice(idx, 1);
+        localStorage.setItem('zflix_movies', JSON.stringify(movies));
+        renderAdminList();
+        renderHero();
+        renderGrid();
+      }
+    }
+
+    // Init Page Load
+    renderHero();
+    renderGrid();
+  </script>
 </body>
 </html>
 
