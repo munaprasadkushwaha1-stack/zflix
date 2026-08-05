@@ -45,13 +45,6 @@
     .card-img-wrapper { position: relative; width: 100%; height: 200px; background: #1a1d26; }
     .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .card-imdb { position: absolute; top: 5px; left: 5px; background: rgba(245, 197, 24, 0.95); color: #000; font-weight: 900; font-size: 10px; padding: 2px 6px; border-radius: 3px; z-index: 4; }
-    
-    /* Action Buttons (Edit & Delete) */
-    .card-actions { position: absolute; top: 5px; right: 5px; display: flex; gap: 4px; z-index: 5; }
-    .action-btn { border: none; padding: 4px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; color: #fff; font-weight: bold; }
-    .btn-edit { background: rgba(255, 165, 0, 0.9); }
-    .btn-delete { background: rgba(229, 9, 20, 0.9); }
-
     .card-title { padding: 8px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
 
     /* Footer */
@@ -59,18 +52,36 @@
     footer span { color: #E50914; }
 
     /* Modals */
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 100; }
-    .modal-content { background: #000; width: 92%; max-width: 800px; position: relative; border-radius: 8px; overflow: hidden; }
-    .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #fff; z-index: 101; }
-    iframe { width: 100%; height: 420px; border: none; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); justify-content: center; align-items: center; z-index: 100; padding: 15px; }
+    .modal-content { background: #12141c; width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; position: relative; border-radius: 12px; border: 1px solid #222630; padding-bottom: 20px; }
+    .close-btn { position: sticky; top: 10px; left: 95%; font-size: 28px; cursor: pointer; color: #fff; z-index: 101; background: rgba(0,0,0,0.7); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    
+    .video-frame { width: 100%; height: 350px; border: none; background: #000; }
+
+    /* Movie Detail Info Under Video */
+    .movie-detail-body { padding: 20px; }
+    .detail-title { font-size: 22px; font-weight: bold; margin-bottom: 8px; }
+    .detail-badges { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+    .info-box { background: #16181f; padding: 12px; border-radius: 8px; margin-top: 10px; border: 1px solid #222630; }
+    .info-label { color: #E50914; font-weight: bold; font-size: 13px; margin-bottom: 4px; }
+    .info-text { color: #ccc; font-size: 13px; line-height: 1.5; }
+    .trailer-frame { width: 100%; height: 220px; border: none; margin-top: 8px; border-radius: 6px; }
 
     /* Admin Modal */
-    .admin-box { background: #16181f; padding: 25px; border-radius: 8px; width: 90%; max-width: 400px; border: 1px solid #222630; position: relative; max-height: 90vh; overflow-y: auto; }
-    .admin-box h3 { margin-bottom: 15px; color: #E50914; }
-    .input-group { margin-bottom: 12px; }
-    .input-group label { display: block; font-size: 12px; margin-bottom: 5px; color: #aaa; }
-    .input-group input, .input-group select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #222630; background: #0b0c10; color: #fff; outline: none; }
+    .admin-box { background: #16181f; padding: 20px; border-radius: 12px; width: 100%; max-width: 500px; border: 1px solid #222630; position: relative; max-height: 90vh; overflow-y: auto; }
+    .admin-box h3 { margin-bottom: 15px; color: #E50914; border-bottom: 1px solid #222630; padding-bottom: 8px; }
+    .input-group { margin-bottom: 10px; }
+    .input-group label { display: block; font-size: 11px; margin-bottom: 4px; color: #aaa; text-transform: uppercase; }
+    .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 8px 12px; border-radius: 5px; border: 1px solid #222630; background: #0b0c10; color: #fff; outline: none; font-size: 13px; }
     .save-btn { width: 100%; padding: 10px; background: #E50914; border: none; color: #fff; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    
+    /* Admin Movie List Table */
+    .admin-list { margin-top: 20px; border-top: 1px solid #222630; padding-top: 15px; }
+    .admin-item { display: flex; justify-content: space-between; align-items: center; background: #0b0c10; padding: 8px 12px; border-radius: 6px; margin-bottom: 6px; font-size: 13px; }
+    .admin-actions { display: flex; gap: 6px; }
+    .btn-sm { border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; color: #fff; font-weight: bold; }
+    .btn-edit { background: #f59e0b; }
+    .btn-del { background: #E50914; }
   </style>
 </head>
 <body>
@@ -124,52 +135,95 @@
     2026 <span>ZFLIX</span> — All rights reserved
   </footer>
 
-  <!-- Video Player Modal -->
+  <!-- Video Player & Detail Modal -->
   <div class="modal" id="playerModal">
     <div class="modal-content">
-      <span class="close-btn" onclick="closePlayer()">&times;</span>
+      <div class="close-btn" onclick="closePlayer()">&times;</div>
       <div id="iframeContainer"></div>
+      
+      <div class="movie-detail-body">
+        <div class="detail-title" id="mDetailTitle">--</div>
+        <div class="detail-badges">
+          <span class="imdb-badge" id="mDetailImdb">⭐ IMDb --</span>
+          <span class="badge" id="mDetailCat">--</span>
+          <span class="badge" style="background:#333;" id="mDetailGenre">--</span>
+        </div>
+
+        <div class="info-box">
+          <div class="info-label">👥 ACTORS / CAST</div>
+          <div class="info-text" id="mDetailCast">Not available</div>
+        </div>
+
+        <div class="info-box">
+          <div class="info-label">📝 STORYLINE / DESCRIPTION</div>
+          <div class="info-text" id="mDetailDesc">No description available.</div>
+        </div>
+
+        <div class="info-box" id="trailerBox">
+          <div class="info-label">🎬 OFFICIAL TRAILER</div>
+          <div id="trailerContainer"></div>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Admin Panel Modal -->
   <div class="modal" id="adminPanel">
     <div class="admin-box">
-      <span class="close-btn" onclick="closeAdmin()">&times;</span>
-      <h3 id="adminModalTitle">Add / Edit Movie</h3>
+      <div class="close-btn" onclick="closeAdmin()">&times;</div>
+      <h3 id="adminModalTitle">Add New Movie</h3>
+      
       <div class="input-group">
         <label>Movie Title</label>
         <input type="text" id="titleInput" placeholder="Enter title...">
       </div>
       <div class="input-group">
         <label>IMDb Rating (e.g. 8.2)</label>
-        <input type="text" id="imdbInput" placeholder="e.g. 8.2">
+        <input type="text" id="imdbInput" placeholder="8.2">
       </div>
       <div class="input-group">
-        <label>Category</label>
-        <select id="catInput">
-          <option value="Bollywood">Bollywood</option>
-          <option value="Hollywood">Hollywood</option>
-          <option value="Hindi Dubbed">Hindi Dubbed</option>
-        </select>
+        <label>Category & Genre</label>
+        <div style="display:flex; gap:10px;">
+          <select id="catInput">
+            <option value="Bollywood">Bollywood</option>
+            <option value="Hollywood">Hollywood</option>
+            <option value="Hindi Dubbed">Hindi Dubbed</option>
+          </select>
+          <select id="genreInput">
+            <option value="Action">Action</option>
+            <option value="Adventure">Adventure</option>
+            <option value="Animation">Animation</option>
+          </select>
+        </div>
       </div>
       <div class="input-group">
-        <label>Genre</label>
-        <select id="genreInput">
-          <option value="Action">Action</option>
-          <option value="Adventure">Adventure</option>
-          <option value="Animation">Animation</option>
-        </select>
+        <label>Actors / Cast</label>
+        <input type="text" id="castInput" placeholder="Shah Rukh Khan, Deepika Padukone...">
       </div>
       <div class="input-group">
-        <label>ImgBB Poster Direct Link (.jpg / .png)</label>
+        <label>Storyline / Description</label>
+        <textarea id="descInput" rows="2" placeholder="Short story of the movie..."></textarea>
+      </div>
+      <div class="input-group">
+        <label>ImgBB Poster Link</label>
         <input type="text" id="posterInput" placeholder="https://i.ibb.co/...">
       </div>
       <div class="input-group">
         <label>Streamtape Embed Link</label>
         <input type="text" id="streamInput" placeholder="https://streamtape.com/e/...">
       </div>
+      <div class="input-group">
+        <label>YouTube Trailer Link (Embed or Watch link)</label>
+        <input type="text" id="trailerInput" placeholder="https://www.youtube.com/embed/...">
+      </div>
+      
       <button class="save-btn" onclick="saveMovie()">Save Movie</button>
+
+      <!-- Manage Existing Movies Section inside Admin Panel -->
+      <div class="admin-list">
+        <h4 style="color:#aaa; margin-bottom:10px; font-size:13px;">Manage Existing Movies (Edit / Delete)</h4>
+        <div id="adminMovieList"></div>
+      </div>
     </div>
   </div>
 
@@ -186,7 +240,7 @@
         document.getElementById('searchInput').value = '';
         const pwd = prompt("Enter Admin Password:");
         if (pwd === "1234") {
-          openAdminForAdd();
+          openAdminPanel();
         } else if (pwd !== null) {
           alert("Incorrect Password!");
         }
@@ -196,14 +250,37 @@
       renderGrid();
     }
 
-    function openAdminForAdd() {
+    function openAdminPanel() {
       editIndex = -1;
       document.getElementById('adminModalTitle').innerText = "Add New Movie";
+      resetAdminForm();
+      renderAdminList();
+      document.getElementById('adminPanel').style.display = 'flex';
+    }
+
+    function resetAdminForm() {
       document.getElementById('titleInput').value = '';
       document.getElementById('imdbInput').value = '';
+      document.getElementById('castInput').value = '';
+      document.getElementById('descInput').value = '';
       document.getElementById('posterInput').value = '';
       document.getElementById('streamInput').value = '';
-      document.getElementById('adminPanel').style.display = 'flex';
+      document.getElementById('trailerInput').value = '';
+    }
+
+    function fixImageLink(url) {
+      if (!url) return 'https://placehold.co/300x450/16181f/fff?text=No+Poster';
+      if (url.includes('ibb.co/') && !url.includes('i.ibb.co/')) {
+        return url.replace('ibb.co/', 'i.ibb.co/') + '.jpg';
+      }
+      return url;
+    }
+
+    function fixYoutubeLink(url) {
+      if (!url) return '';
+      if (url.includes('watch?v=')) return url.replace('watch?v=', 'embed/');
+      if (url.includes('youtu.be/')) return url.replace('youtu.be/', 'youtube.com/embed/');
+      return url;
     }
 
     function renderHero() {
@@ -217,20 +294,11 @@
       document.getElementById('heroTitle').innerText = m.title;
       document.getElementById('heroImg').src = fixImageLink(m.poster);
       document.getElementById('heroImdb').innerText = `⭐ IMDb ${m.imdb || 'N/A'}`;
-      document.getElementById('heroWatchBtn').onclick = () => playVideo(m.streamUrl);
+      document.getElementById('heroWatchBtn').onclick = () => playMovie(currentSlide % movies.length);
     }
 
     function prevSlide() { if(movies.length) { currentSlide = (currentSlide - 1 + movies.length) % movies.length; renderHero(); } }
     function nextSlide() { if(movies.length) { currentSlide = (currentSlide + 1) % movies.length; renderHero(); } }
-
-    function fixImageLink(url) {
-      if (!url) return '';
-      // Convert ibb.co webpage link to direct i.ibb.co link if user pastes page URL
-      if (url.includes('ibb.co/') && !url.includes('i.ibb.co/')) {
-        return url.replace('ibb.co/', 'i.ibb.co/') + '.jpg';
-      }
-      return url;
-    }
 
     function renderGrid() {
       const grid = document.getElementById('movieGrid');
@@ -245,19 +313,17 @@
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = '<p style="color:#555; grid-column: 1/-1;">Koi movie nahi hai. Search bar me xxxxx likh kar add karein.</p>';
+        grid.innerHTML = '<p style="color:#555; grid-column: 1/-1;">Koi movie nahi hai. Admin Panel se add karein.</p>';
         return;
       }
 
-      filtered.forEach((m, idx) => {
+      filtered.forEach((m) => {
+        const originalIndex = movies.indexOf(m);
         const card = document.createElement('div');
         card.className = 'card';
+        card.onclick = () => playMovie(originalIndex);
         card.innerHTML = `
-          <div class="card-actions">
-            <button class="action-btn btn-edit" onclick="event.stopPropagation(); editMovie(${idx})">✏️</button>
-            <button class="action-btn btn-delete" onclick="event.stopPropagation(); deleteMovie(${idx})">🗑️</button>
-          </div>
-          <div class="card-img-wrapper" onclick="playVideo('${m.streamUrl}')">
+          <div class="card-img-wrapper">
             <span class="card-imdb">⭐ ${m.imdb || 'N/A'}</span>
             <img src="${fixImageLink(m.poster)}" onerror="this.src='https://placehold.co/300x450/16181f/fff?text=No+Poster'">
           </div>
@@ -265,6 +331,33 @@
         `;
         grid.appendChild(card);
       });
+    }
+
+    function playMovie(idx) {
+      const m = movies[idx];
+      if (!m) return;
+
+      let embedUrl = m.streamUrl || '';
+      if (embedUrl.includes('streamtape.com/v/')) embedUrl = embedUrl.replace('/v/', '/e/');
+      
+      document.getElementById('iframeContainer').innerHTML = `<iframe class="video-frame" src="${embedUrl}" allowfullscreen></iframe>`;
+      
+      document.getElementById('mDetailTitle').innerText = m.title;
+      document.getElementById('mDetailImdb').innerText = `⭐ IMDb ${m.imdb || 'N/A'}`;
+      document.getElementById('mDetailCat').innerText = m.category || 'All';
+      document.getElementById('mDetailGenre').innerText = m.genre || 'General';
+      document.getElementById('mDetailCast').innerText = m.cast || 'Actors detail not added.';
+      document.getElementById('mDetailDesc').innerText = m.desc || 'No storyline provided.';
+
+      if (m.trailerUrl) {
+        document.getElementById('trailerBox').style.display = 'block';
+        document.getElementById('trailerContainer').innerHTML = `<iframe class="trailer-frame" src="${fixYoutubeLink(m.trailerUrl)}" allowfullscreen></iframe>`;
+      } else {
+        document.getElementById('trailerBox').style.display = 'none';
+        document.getElementById('trailerContainer').innerHTML = '';
+      }
+
+      document.getElementById('playerModal').style.display = 'flex';
     }
 
     function filterCategory(cat, el) {
@@ -281,19 +374,34 @@
       renderGrid();
     }
 
-    function playVideo(url) {
-      let embedUrl = url;
-      if (url.includes('streamtape.com/v/')) embedUrl = url.replace('/v/', '/e/');
-      document.getElementById('iframeContainer').innerHTML = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
-      document.getElementById('playerModal').style.display = 'flex';
-    }
-
     function closePlayer() {
       document.getElementById('playerModal').style.display = 'none';
       document.getElementById('iframeContainer').innerHTML = '';
+      document.getElementById('trailerContainer').innerHTML = '';
     }
 
     function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
+
+    function renderAdminList() {
+      const listContainer = document.getElementById('adminMovieList');
+      listContainer.innerHTML = '';
+      if (movies.length === 0) {
+        listContainer.innerHTML = '<p style="color:#666; font-size:12px;">No movies found.</p>';
+        return;
+      }
+      movies.forEach((m, idx) => {
+        const item = document.createElement('div');
+        item.className = 'admin-item';
+        item.innerHTML = `
+          <span>${m.title}</span>
+          <div class="admin-actions">
+            <button class="btn-sm btn-edit" onclick="editMovie(${idx})">Edit</button>
+            <button class="btn-sm btn-del" onclick="deleteMovie(${idx})">Delete</button>
+          </div>
+        `;
+        listContainer.appendChild(item);
+      });
+    }
 
     function editMovie(idx) {
       editIndex = idx;
@@ -303,9 +411,11 @@
       document.getElementById('imdbInput').value = m.imdb || '';
       document.getElementById('catInput').value = m.category || 'Bollywood';
       document.getElementById('genreInput').value = m.genre || 'Action';
+      document.getElementById('castInput').value = m.cast || '';
+      document.getElementById('descInput').value = m.desc || '';
       document.getElementById('posterInput').value = m.poster || '';
       document.getElementById('streamInput').value = m.streamUrl || '';
-      document.getElementById('adminPanel').style.display = 'flex';
+      document.getElementById('trailerInput').value = m.trailerUrl || '';
     }
 
     function saveMovie() {
@@ -313,12 +423,15 @@
       const imdb = document.getElementById('imdbInput').value.trim();
       const category = document.getElementById('catInput').value;
       const genre = document.getElementById('genreInput').value;
+      const cast = document.getElementById('castInput').value.trim();
+      const desc = document.getElementById('descInput').value.trim();
       const poster = document.getElementById('posterInput').value.trim();
       const streamUrl = document.getElementById('streamInput').value.trim();
+      const trailerUrl = document.getElementById('trailerInput').value.trim();
 
-      if (!title || !poster || !streamUrl) { alert('Title, Poster link aur Stream link zaruri hain!'); return; }
+      if (!title || !poster || !streamUrl) { alert('Title, Poster link aur Stream link zaroori hain!'); return; }
 
-      const movieData = { title, imdb, category, genre, poster, streamUrl };
+      const movieData = { title, imdb, category, genre, cast, desc, poster, streamUrl, trailerUrl };
 
       if (editIndex >= 0) {
         movies[editIndex] = movieData;
@@ -327,15 +440,20 @@
       }
 
       localStorage.setItem('zflix_movies', JSON.stringify(movies));
-      closeAdmin();
+      resetAdminForm();
+      editIndex = -1;
+      document.getElementById('adminModalTitle').innerText = "Add New Movie";
+      renderAdminList();
       renderHero();
       renderGrid();
+      alert('Movie successfully save ho gayi!');
     }
 
     function deleteMovie(idx) {
       if (confirm('Kya aap is movie ko delete karna chahte hain?')) {
         movies.splice(idx, 1);
         localStorage.setItem('zflix_movies', JSON.stringify(movies));
+        renderAdminList();
         renderHero();
         renderGrid();
       }
