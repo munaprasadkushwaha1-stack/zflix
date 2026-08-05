@@ -21,21 +21,21 @@
     .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #0b0c10 10%, transparent 90%); }
     .hero-content { position: relative; z-index: 2; padding: 25px; width: 100%; }
     .badge-group { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-    .badge { background: #E50914; color: #fff; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; }
+    .badge { background: #E50914; color: #fff; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; }
     .imdb-badge { background: #f5c518; color: #000; font-weight: 900; font-size: 11px; padding: 3px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px; }
     .hero-title { font-size: 24px; font-weight: bold; margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
     .watch-btn { background: #E50914; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
     .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: #fff; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #333; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 3; }
     .prev-btn { left: 15px; } .next-btn { right: 15px; }
 
-    /* Category Chips */
+    /* Category & Genre Chips */
     .filter-section { padding: 10px 5%; display: flex; flex-direction: column; gap: 10px; }
     .chips-row { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
     .chips-row::-webkit-scrollbar { display: none; }
     .chip { background: #16181f; color: #aaa; border: 1px solid #222630; padding: 7px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
     .chip.active { background: #E50914; color: #fff; border-color: #E50914; }
 
-    /* Movie Section */
+    /* Movie Grid */
     .main-container { padding: 20px 5%; }
     .section-title { font-size: 18px; margin-bottom: 15px; }
     .section-title span { color: #E50914; }
@@ -58,6 +58,11 @@
     
     .video-frame { width: 100%; height: 350px; border: none; background: #000; }
 
+    /* Server Switch Buttons */
+    .server-switch-box { display: flex; gap: 10px; padding: 12px 20px; background: #16181f; border-bottom: 1px solid #222630; align-items: center; }
+    .server-btn { flex: 1; padding: 8px 12px; background: #0b0c10; color: #aaa; border: 1px solid #222630; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; text-align: center; }
+    .server-btn.active { background: #E50914; color: #fff; border-color: #E50914; }
+
     /* Movie Detail Info Under Video */
     .movie-detail-body { padding: 20px; }
     .detail-title { font-size: 22px; font-weight: bold; margin-bottom: 8px; }
@@ -73,9 +78,10 @@
     .input-group { margin-bottom: 10px; }
     .input-group label { display: block; font-size: 11px; margin-bottom: 4px; color: #aaa; text-transform: uppercase; }
     .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 8px 12px; border-radius: 5px; border: 1px solid #222630; background: #0b0c10; color: #fff; outline: none; font-size: 13px; }
+    .fetch-box { display: flex; gap: 8px; }
+    .fetch-btn { background: #2563eb; color: #fff; border: none; padding: 0 15px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 12px; white-space: nowrap; }
     .save-btn { width: 100%; padding: 10px; background: #E50914; border: none; color: #fff; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
     
-    /* Admin Movie List Table */
     .admin-list { margin-top: 20px; border-top: 1px solid #222630; padding-top: 15px; }
     .admin-item { display: flex; justify-content: space-between; align-items: center; background: #0b0c10; padding: 8px 12px; border-radius: 6px; margin-bottom: 6px; font-size: 13px; }
     .admin-actions { display: flex; gap: 6px; }
@@ -135,12 +141,22 @@
     2026 <span>ZFLIX</span> — All rights reserved
   </footer>
 
-  <!-- Video Player & Detail Modal -->
+  <!-- Video Player Modal -->
   <div class="modal" id="playerModal">
     <div class="modal-content">
       <div class="close-btn" onclick="closePlayer()">&times;</div>
-      <div id="iframeContainer"></div>
       
+      <!-- Video Player Frame -->
+      <div id="iframeContainer"></div>
+
+      <!-- Server Switch Buttons (Streamtape & Vidhide) -->
+      <div class="server-switch-box">
+        <span style="font-size:12px; color:#aaa; font-weight:bold;">SERVERS:</span>
+        <button class="server-btn active" id="btnServer1" onclick="switchServer(1)">Server 1 (Streamtape)</button>
+        <button class="server-btn" id="btnServer2" onclick="switchServer(2)">Server 2 (Vidhide)</button>
+      </div>
+      
+      <!-- Movie Details -->
       <div class="movie-detail-body">
         <div class="detail-title" id="mDetailTitle">--</div>
         <div class="detail-badges">
@@ -173,6 +189,15 @@
       <div class="close-btn" onclick="closeAdmin()">&times;</div>
       <h3 id="adminModalTitle">Add New Movie</h3>
       
+      <!-- AUTOMATIC IMDB FETCH BOX -->
+      <div class="input-group" style="background: #0b0c10; padding: 10px; border-radius: 6px; border: 1px solid #222630;">
+        <label style="color:#2563eb; font-weight:bold;">AUTO-FILL WITH IMDB ID</label>
+        <div class="fetch-box">
+          <input type="text" id="imdbIdInput" placeholder="Enter IMDb ID (e.g. tt1375666)">
+          <button type="button" class="fetch-btn" onclick="fetchImdbData()">Fetch Data</button>
+        </div>
+      </div>
+
       <div class="input-group">
         <label>Movie Title</label>
         <input type="text" id="titleInput" placeholder="Enter title...">
@@ -205,21 +230,28 @@
         <textarea id="descInput" rows="2" placeholder="Short story of the movie..."></textarea>
       </div>
       <div class="input-group">
-        <label>ImgBB Poster Link</label>
+        <label>Poster Link</label>
         <input type="text" id="posterInput" placeholder="https://i.ibb.co/...">
       </div>
+      
+      <!-- VIDEO LINKS -->
       <div class="input-group">
-        <label>Streamtape Embed Link</label>
+        <label>Streamtape Embed Link (Server 1)</label>
         <input type="text" id="streamInput" placeholder="https://streamtape.com/e/...">
       </div>
       <div class="input-group">
-        <label>YouTube Trailer Link (Embed or Watch link)</label>
+        <label style="color:#10b981;">Vidhide Embed Link (Server 2)</label>
+        <input type="text" id="vidhideInput" placeholder="https://vidhide.com/e/...">
+      </div>
+
+      <div class="input-group">
+        <label>YouTube Trailer Link</label>
         <input type="text" id="trailerInput" placeholder="https://www.youtube.com/embed/...">
       </div>
       
       <button class="save-btn" onclick="saveMovie()">Save Movie</button>
 
-      <!-- Manage Existing Movies Section inside Admin Panel -->
+      <!-- Manage Existing Movies -->
       <div class="admin-list">
         <h4 style="color:#aaa; margin-bottom:10px; font-size:13px;">Manage Existing Movies (Edit / Delete)</h4>
         <div id="adminMovieList"></div>
@@ -233,8 +265,9 @@
     let selectedCategory = 'All';
     let selectedGenre = 'All';
     let editIndex = -1;
+    let activeMovieObj = null;
 
-    // Secret Admin Trigger (Type 5 times 'x' in search box)
+    // Search Box Trigger for Admin Panel (Type 'xxxxx')
     function handleSearch(val) {
       if (val.toLowerCase() === 'xxxxx') {
         document.getElementById('searchInput').value = '';
@@ -250,6 +283,34 @@
       renderGrid();
     }
 
+    // IMDb Auto-Fetch Function
+    async function fetchImdbData() {
+      const imdbId = document.getElementById('imdbIdInput').value.trim();
+      if (!imdbId) {
+        alert('Kripya IMDb ID bharein! (Jaise: tt1375666)');
+        return;
+      }
+      const cleanId = imdbId.startsWith('tt') ? imdbId : 'tt' + imdbId;
+
+      try {
+        const response = await fetch(`https://www.omdbapi.com/?i=${cleanId}&apikey=trilogy`);
+        const data = await response.json();
+
+        if (data.Response === 'True') {
+          document.getElementById('titleInput').value = data.Title || '';
+          document.getElementById('imdbInput').value = data.imdbRating !== 'N/A' ? data.imdbRating : '';
+          document.getElementById('castInput').value = data.Actors !== 'N/A' ? data.Actors : '';
+          document.getElementById('descInput').value = data.Plot !== 'N/A' ? data.Plot : '';
+          document.getElementById('posterInput').value = data.Poster !== 'N/A' ? data.Poster : '';
+          alert('Details automatically fetch ho gayi hain!');
+        } else {
+          alert('Movie nahi mili! IMDb ID check karein.');
+        }
+      } catch (err) {
+        alert('Data fetch karne me error aaya.');
+      }
+    }
+
     function openAdminPanel() {
       editIndex = -1;
       document.getElementById('adminModalTitle').innerText = "Add New Movie";
@@ -259,20 +320,21 @@
     }
 
     function resetAdminForm() {
+      document.getElementById('imdbIdInput').value = '';
       document.getElementById('titleInput').value = '';
       document.getElementById('imdbInput').value = '';
       document.getElementById('castInput').value = '';
       document.getElementById('descInput').value = '';
       document.getElementById('posterInput').value = '';
       document.getElementById('streamInput').value = '';
+      document.getElementById('vidhideInput').value = '';
       document.getElementById('trailerInput').value = '';
     }
 
-    function fixImageLink(url) {
-      if (!url) return 'https://placehold.co/300x450/16181f/fff?text=No+Poster';
-      if (url.includes('ibb.co/') && !url.includes('i.ibb.co/')) {
-        return url.replace('ibb.co/', 'i.ibb.co/') + '.jpg';
-      }
+    function fixEmbedUrl(url) {
+      if (!url) return '';
+      if (url.includes('streamtape.com/v/')) return url.replace('/v/', '/e/');
+      if (url.includes('vidhide.com/v/')) return url.replace('/v/', '/e/');
       return url;
     }
 
@@ -292,7 +354,7 @@
       }
       const m = movies[currentSlide % movies.length];
       document.getElementById('heroTitle').innerText = m.title;
-      document.getElementById('heroImg').src = fixImageLink(m.poster);
+      document.getElementById('heroImg').src = m.poster || 'https://placehold.co/600x400/16181f/fff?text=No+Poster';
       document.getElementById('heroImdb').innerText = `⭐ IMDb ${m.imdb || 'N/A'}`;
       document.getElementById('heroWatchBtn').onclick = () => playMovie(currentSlide % movies.length);
     }
@@ -313,7 +375,7 @@
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = '<p style="color:#555; grid-column: 1/-1;">Koi movie nahi hai. Admin Panel se add karein.</p>';
+        grid.innerHTML = '<p style="color:#555; grid-column: 1/-1;">Koi movie nahi hai.</p>';
         return;
       }
 
@@ -325,7 +387,7 @@
         card.innerHTML = `
           <div class="card-img-wrapper">
             <span class="card-imdb">⭐ ${m.imdb || 'N/A'}</span>
-            <img src="${fixImageLink(m.poster)}" onerror="this.src='https://placehold.co/300x450/16181f/fff?text=No+Poster'">
+            <img src="${m.poster}" onerror="this.src='https://placehold.co/300x450/16181f/fff?text=No+Poster'">
           </div>
           <div class="card-title">${m.title}</div>
         `;
@@ -334,30 +396,51 @@
     }
 
     function playMovie(idx) {
-      const m = movies[idx];
-      if (!m) return;
+      activeMovieObj = movies[idx];
+      if (!activeMovieObj) return;
 
-      let embedUrl = m.streamUrl || '';
-      if (embedUrl.includes('streamtape.com/v/')) embedUrl = embedUrl.replace('/v/', '/e/');
-      
-      document.getElementById('iframeContainer').innerHTML = `<iframe class="video-frame" src="${embedUrl}" allowfullscreen></iframe>`;
-      
-      document.getElementById('mDetailTitle').innerText = m.title;
-      document.getElementById('mDetailImdb').innerText = `⭐ IMDb ${m.imdb || 'N/A'}`;
-      document.getElementById('mDetailCat').innerText = m.category || 'All';
-      document.getElementById('mDetailGenre').innerText = m.genre || 'General';
-      document.getElementById('mDetailCast').innerText = m.cast || 'Actors detail not added.';
-      document.getElementById('mDetailDesc').innerText = m.desc || 'No storyline provided.';
+      switchServer(1); // Default Server 1 Play karega
 
-      if (m.trailerUrl) {
+      document.getElementById('mDetailTitle').innerText = activeMovieObj.title;
+      document.getElementById('mDetailImdb').innerText = `⭐ IMDb ${activeMovieObj.imdb || 'N/A'}`;
+      document.getElementById('mDetailCat').innerText = activeMovieObj.category || 'All';
+      document.getElementById('mDetailGenre').innerText = activeMovieObj.genre || 'General';
+      document.getElementById('mDetailCast').innerText = activeMovieObj.cast || 'Actors detail not added.';
+      document.getElementById('mDetailDesc').innerText = activeMovieObj.desc || 'No storyline provided.';
+
+      if (activeMovieObj.trailerUrl) {
         document.getElementById('trailerBox').style.display = 'block';
-        document.getElementById('trailerContainer').innerHTML = `<iframe class="trailer-frame" src="${fixYoutubeLink(m.trailerUrl)}" allowfullscreen></iframe>`;
+        document.getElementById('trailerContainer').innerHTML = `<iframe class="trailer-frame" src="${fixYoutubeLink(activeMovieObj.trailerUrl)}" allowfullscreen></iframe>`;
       } else {
         document.getElementById('trailerBox').style.display = 'none';
         document.getElementById('trailerContainer').innerHTML = '';
       }
 
       document.getElementById('playerModal').style.display = 'flex';
+    }
+
+    function switchServer(serverNum) {
+      if (!activeMovieObj) return;
+
+      const btn1 = document.getElementById('btnServer1');
+      const btn2 = document.getElementById('btnServer2');
+
+      let targetUrl = '';
+      if (serverNum === 1) {
+        targetUrl = fixEmbedUrl(activeMovieObj.streamUrl);
+        btn1.classList.add('active');
+        btn2.classList.remove('active');
+      } else {
+        targetUrl = fixEmbedUrl(activeMovieObj.vidhideUrl || activeMovieObj.streamUrl);
+        btn2.classList.add('active');
+        btn1.classList.remove('active');
+      }
+
+      if (targetUrl) {
+        document.getElementById('iframeContainer').innerHTML = `<iframe class="video-frame" src="${targetUrl}" allowfullscreen></iframe>`;
+      } else {
+        document.getElementById('iframeContainer').innerHTML = `<div style="padding:40px; text-align:center; color:#888;">Is server ka link available nahi hai.</div>`;
+      }
     }
 
     function filterCategory(cat, el) {
@@ -415,6 +498,7 @@
       document.getElementById('descInput').value = m.desc || '';
       document.getElementById('posterInput').value = m.poster || '';
       document.getElementById('streamInput').value = m.streamUrl || '';
+      document.getElementById('vidhideInput').value = m.vidhideUrl || '';
       document.getElementById('trailerInput').value = m.trailerUrl || '';
     }
 
@@ -424,14 +508,16 @@
       const category = document.getElementById('catInput').value;
       const genre = document.getElementById('genreInput').value;
       const cast = document.getElementById('castInput').value.trim();
+      document.getElementById('descInput').value.trim();
       const desc = document.getElementById('descInput').value.trim();
       const poster = document.getElementById('posterInput').value.trim();
       const streamUrl = document.getElementById('streamInput').value.trim();
+      const vidhideUrl = document.getElementById('vidhideInput').value.trim();
       const trailerUrl = document.getElementById('trailerInput').value.trim();
 
-      if (!title || !poster || !streamUrl) { alert('Title, Poster link aur Stream link zaroori hain!'); return; }
+      if (!title || !poster) { alert('Movie Title aur Poster Link zaroori hai!'); return; }
 
-      const movieData = { title, imdb, category, genre, cast, desc, poster, streamUrl, trailerUrl };
+      const movieData = { title, imdb, category, genre, cast, desc, poster, streamUrl, vidhideUrl, trailerUrl };
 
       if (editIndex >= 0) {
         movies[editIndex] = movieData;
@@ -459,7 +545,7 @@
       }
     }
 
-    // Init
+    // Init Page Load
     renderHero();
     renderGrid();
   </script>
