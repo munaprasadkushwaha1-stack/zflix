@@ -35,16 +35,7 @@
     .chip { background: #16181f; color: #aaa; border: 1px solid #222630; padding: 7px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
     .chip.active { background: #E50914; color: #fff; border-color: #E50914; }
 
-    /* TMDB Scroll Section */
-    .tmdb-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; }
-    .tmdb-scroll::-webkit-scrollbar { height: 6px; }
-    .tmdb-scroll::-webkit-scrollbar-thumb { background: #E50914; border-radius: 10px; }
-    .tmdb-card { flex: 0 0 140px; background: #16181f; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; transition: 0.2s; border: 1px solid #222630; }
-    .tmdb-card:hover { transform: scale(1.05); }
-    .tmdb-card img { width: 100%; height: 200px; object-fit: cover; }
-    .tmdb-date { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(229, 9, 20, 0.9); color: white; font-size: 10px; font-weight: bold; text-align: center; padding: 4px; }
-
-    /* Movie Grid */
+    /* Movie Grid (Vertical Scroll Only) */
     .main-container { padding: 20px 5%; }
     .section-title { font-size: 18px; margin-bottom: 15px; }
     .section-title span { color: #E50914; }
@@ -60,19 +51,17 @@
     footer { text-align: center; font-size: 12px; color: #555; margin-top: 40px; }
     footer span { color: #E50914; }
 
-    /* Modals */
+    /* Video Player Modal */
     .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); justify-content: center; align-items: center; z-index: 100; padding: 15px; }
     .modal-content { background: #12141c; width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; position: relative; border-radius: 12px; border: 1px solid #222630; padding-bottom: 20px; }
     .close-btn { position: sticky; top: 10px; left: 95%; font-size: 28px; cursor: pointer; color: #fff; z-index: 101; background: rgba(0,0,0,0.7); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     
     .video-frame { width: 100%; height: 380px; border: none; background: #000; }
-
-    /* Server Switch Buttons */
     .server-switch-box { display: flex; gap: 10px; padding: 12px 20px; background: #16181f; border-bottom: 1px solid #222630; align-items: center; }
     .server-btn { flex: 1; padding: 10px 14px; background: #0b0c10; color: #aaa; border: 1px solid #222630; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; text-align: center; transition: 0.3s; }
     .server-btn.active { background: #E50914; color: #fff; border-color: #E50914; }
 
-    /* Movie Detail Info Under Video */
+    /* Movie Detail Info */
     .movie-detail-body { padding: 20px; }
     .detail-title { font-size: 22px; font-weight: bold; margin-bottom: 8px; }
     .detail-badges { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
@@ -82,12 +71,23 @@
     .trailer-frame { width: 100%; height: 220px; border: none; margin-top: 8px; border-radius: 6px; }
 
     /* Admin Modal */
-    .admin-box { background: #16181f; padding: 20px; border-radius: 12px; width: 100%; max-width: 500px; border: 1px solid #222630; position: relative; max-height: 90vh; overflow-y: auto; }
-    .admin-box h3 { margin-bottom: 15px; color: #E50914; border-bottom: 1px solid #222630; padding-bottom: 8px; }
+    .admin-box { background: #16181f; padding: 20px; border-radius: 12px; width: 100%; max-width: 700px; border: 1px solid #222630; position: relative; max-height: 90vh; overflow-y: auto; }
+    .admin-box h3 { margin-bottom: 15px; color: #E50914; border-bottom: 1px solid #222630; padding-bottom: 8px; font-size: 16px; }
+    
+    /* TMDB Inside Admin */
+    .tmdb-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; margin-bottom: 15px; }
+    .tmdb-scroll::-webkit-scrollbar { height: 6px; }
+    .tmdb-scroll::-webkit-scrollbar-thumb { background: #E50914; border-radius: 10px; }
+    .tmdb-card { flex: 0 0 110px; background: #0b0c10; border-radius: 6px; overflow: hidden; position: relative; cursor: pointer; transition: 0.2s; border: 1px solid #222630; }
+    .tmdb-card:hover { transform: scale(1.05); border-color: #2563eb; }
+    .tmdb-card img { width: 100%; height: 160px; object-fit: cover; }
+    .tmdb-card .import-badge { position: absolute; bottom: 0; left: 0; width: 100%; background: #2563eb; color: white; font-size: 9px; font-weight: bold; text-align: center; padding: 4px; }
+
+    /* Admin Form */
     .input-group { margin-bottom: 10px; }
     .input-group label { display: block; font-size: 11px; margin-bottom: 4px; color: #aaa; text-transform: uppercase; }
     .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 8px 12px; border-radius: 5px; border: 1px solid #222630; background: #0b0c10; color: #fff; outline: none; font-size: 13px; }
-    .save-btn { width: 100%; padding: 10px; background: #E50914; border: none; color: #fff; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    .save-btn { width: 100%; padding: 12px; background: #E50914; border: none; color: #fff; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; font-size: 15px; }
     
     .admin-list { margin-top: 20px; border-top: 1px solid #222630; padding-top: 15px; }
     .admin-item { display: flex; justify-content: space-between; align-items: center; background: #0b0c10; padding: 8px 12px; border-radius: 6px; margin-bottom: 6px; font-size: 13px; }
@@ -122,29 +122,34 @@
     </div>
   </div>
 
-  <!-- Category Chips (NEW) -->
+  <!-- Category & Genre Chips (For Home Page Filter) -->
   <div class="filter-section">
-    <div class="chips-row">
-      <div class="chip active" onclick="changeCategory('Trending', this)">🔥 Trending</div>
-      <div class="chip" onclick="changeCategory('Hollywood', this)">Hollywood</div>
-      <div class="chip" onclick="changeCategory('Bollywood', this)">Bollywood</div>
-      <div class="chip" onclick="changeCategory('Tollywood', this)">Tollywood (Telugu)</div>
-      <div class="chip" onclick="changeCategory('Kollywood', this)">Kollywood (Tamil)</div>
-      <div class="chip" onclick="changeCategory('Malayalam', this)">Malayalam</div>
-      <div class="chip" onclick="changeCategory('Kannada', this)">Kannada</div>
-      <div class="chip" onclick="changeCategory('Web Series', this)">📺 Web Series</div>
+    <!-- Categories -->
+    <div class="chips-row" id="homeCatChips">
+      <div class="chip active" onclick="filterHomeCategory('All', this)">All</div>
+      <div class="chip" onclick="filterHomeCategory('Hollywood', this)">Hollywood</div>
+      <div class="chip" onclick="filterHomeCategory('Bollywood', this)">Bollywood</div>
+      <div class="chip" onclick="filterHomeCategory('Tollywood', this)">Tollywood</div>
+      <div class="chip" onclick="filterHomeCategory('Kollywood', this)">Kollywood</div>
+      <div class="chip" onclick="filterHomeCategory('Malayalam', this)">Malayalam</div>
+      <div class="chip" onclick="filterHomeCategory('Kannada', this)">Kannada</div>
+      <div class="chip" onclick="filterHomeCategory('Animation', this)">Animation</div>
+      <div class="chip" onclick="filterHomeCategory('Web Series', this)">📺 Web Series</div>
+    </div>
+    <!-- Genres -->
+    <div class="chips-row" id="homeGenreChips">
+      <div class="chip active" onclick="filterHomeGenre('All', this)">All Genres</div>
+      <div class="chip" onclick="filterHomeGenre('Action', this)">Action</div>
+      <div class="chip" onclick="filterHomeGenre('Adventure', this)">Adventure</div>
+      <div class="chip" onclick="filterHomeGenre('Comedy', this)">Comedy</div>
+      <div class="chip" onclick="filterHomeGenre('Horror', this)">Horror</div>
+      <div class="chip" onclick="filterHomeGenre('Romance', this)">Romance</div>
+      <div class="chip" onclick="filterHomeGenre('Sci-Fi', this)">Sci-Fi</div>
+      <div class="chip" onclick="filterHomeGenre('Thriller', this)">Thriller</div>
     </div>
   </div>
 
-  <!-- TMDB Upcoming / Trending Section (Auto Fetched) -->
-  <div class="main-container" style="padding-bottom: 0;">
-    <div class="section-title" id="tmdbSectionTitle">🔥 Trending <span>Now</span></div>
-    <div class="chips-row tmdb-scroll" id="tmdbGrid">
-      <p style="color:#555;">Loading data...</p>
-    </div>
-  </div>
-
-  <!-- Movie Grid (Your Firebase Database) -->
+  <!-- Movie Grid (Only Shows Firebase Library) -->
   <div class="main-container">
     <div class="section-title">My <span>Library</span></div>
     <div class="grid" id="movieGrid"></div>
@@ -159,22 +164,20 @@
     <div class="modal-content">
       <div class="close-btn" onclick="closePlayer()">&times;</div>
       
-      <!-- Video Player Frame -->
       <div id="iframeContainer"></div>
 
-      <!-- Server Switch Buttons -->
       <div class="server-switch-box" id="serverSwitchBox">
         <span style="font-size:12px; color:#aaa; font-weight:bold;">SERVERS:</span>
         <button class="server-btn active" id="btnServer1" onclick="switchServer(1)">🌐 Server 1 (Ok.ru)</button>
         <button class="server-btn" id="btnServer2" onclick="switchServer(2)">📼 Server 2 (Streamtape)</button>
       </div>
       
-      <!-- Movie Details -->
       <div class="movie-detail-body">
         <div class="detail-title" id="mDetailTitle">--</div>
         <div class="detail-badges">
           <span class="imdb-badge" id="mDetailImdb">⭐ IMDb --</span>
           <span class="badge" id="mDetailCat">--</span>
+          <span class="badge" style="background:#333;" id="mDetailGenre">--</span>
         </div>
 
         <div class="info-box">
@@ -199,7 +202,29 @@
   <div class="modal" id="adminPanel">
     <div class="admin-box">
       <div class="close-btn" onclick="closeAdmin()">&times;</div>
-      <h3 id="adminModalTitle">Add New Content</h3>
+      
+      <!-- TMDB IN ADMIN PANEL -->
+      <h3 style="color:#2563eb;">🔍 Find & Import from TMDB</h3>
+      <div class="chips-row" style="margin-bottom:10px;" id="adminTmdbChips">
+        <div class="chip active" onclick="fetchAdminTMDB('Trending', this)">🔥 Trending</div>
+        <div class="chip" onclick="fetchAdminTMDB('Hollywood', this)">Hollywood</div>
+        <div class="chip" onclick="fetchAdminTMDB('Bollywood', this)">Bollywood</div>
+        <div class="chip" onclick="fetchAdminTMDB('Tollywood', this)">Tollywood</div>
+        <div class="chip" onclick="fetchAdminTMDB('Kollywood', this)">Kollywood</div>
+        <div class="chip" onclick="fetchAdminTMDB('Malayalam', this)">Malayalam</div>
+        <div class="chip" onclick="fetchAdminTMDB('Kannada', this)">Kannada</div>
+        <div class="chip" onclick="fetchAdminTMDB('Animation', this)">Animation</div>
+        <div class="chip" onclick="fetchAdminTMDB('Web Series', this)">📺 Web Series</div>
+      </div>
+      <!-- TMDB Results Scroll -->
+      <div class="tmdb-scroll" id="adminTmdbGrid">
+        <p style="color:#555; padding:10px;">Select a category above to load movies.</p>
+      </div>
+
+      <hr style="border:0; border-top:1px solid #222630; margin:15px 0;">
+
+      <!-- ADMIN FORM -->
+      <h3 id="adminModalTitle">📝 Add / Edit Content</h3>
       
       <div class="input-group">
         <label>Title</label>
@@ -210,16 +235,29 @@
         <input type="text" id="imdbInput" placeholder="8.2">
       </div>
       <div class="input-group">
-        <label>Category</label>
-        <select id="catInput">
-          <option value="Hollywood">Hollywood</option>
-          <option value="Bollywood">Bollywood</option>
-          <option value="Tollywood">Tollywood (Telugu)</option>
-          <option value="Kollywood">Kollywood (Tamil)</option>
-          <option value="Malayalam">Malayalam</option>
-          <option value="Kannada">Kannada</option>
-          <option value="Web Series">Web Series</option>
-        </select>
+        <label>Category & Genre</label>
+        <div style="display:flex; gap:10px;">
+          <select id="catInput">
+            <option value="Hollywood">Hollywood</option>
+            <option value="Bollywood">Bollywood</option>
+            <option value="Tollywood">Tollywood</option>
+            <option value="Kollywood">Kollywood</option>
+            <option value="Malayalam">Malayalam</option>
+            <option value="Kannada">Kannada</option>
+            <option value="Animation">Animation</option>
+            <option value="Web Series">Web Series</option>
+          </select>
+          <select id="genreInput">
+            <option value="Action">Action</option>
+            <option value="Adventure">Adventure</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Horror">Horror</option>
+            <option value="Romance">Romance</option>
+            <option value="Sci-Fi">Sci-Fi</option>
+            <option value="Thriller">Thriller</option>
+            <option value="Drama">Drama</option>
+          </select>
+        </div>
       </div>
       <div class="input-group">
         <label>Actors / Cast</label>
@@ -231,7 +269,7 @@
       </div>
       <div class="input-group">
         <label>Poster Link</label>
-        <input type="text" id="posterInput" placeholder="https://i.ibb.co/...">
+        <input type="text" id="posterInput" placeholder="https://image.tmdb.org/...">
       </div>
       
       <!-- VIDEO LINKS -->
@@ -249,7 +287,7 @@
         <input type="text" id="trailerInput" placeholder="https://www.youtube.com/embed/...">
       </div>
       
-      <button class="save-btn" onclick="saveMovie()">Save Content</button>
+      <button class="save-btn" onclick="saveMovie()">Save To My Website</button>
 
       <!-- Manage Existing Data -->
       <div class="admin-list">
@@ -264,6 +302,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
   <script>
+    // Firebase Config (Do not change)
     const firebaseConfig = {
       apiKey: "AIzaSyA2yXT2VlPBhGo59i_DX5fkNHyLqEPxZ8E",
       authDomain: "zflixhub.firebaseapp.com",
@@ -281,22 +320,21 @@
 
     let movies = [];
     let currentSlide = 0;
-    let selectedCategory = 'Trending';
+    
+    // Home Page Filters
+    let homeSelectedCategory = 'All';
+    let homeSelectedGenre = 'All';
+    
     let editDocId = null;
     let activeMovieObj = null;
     
-    // Variables for Admin & Import Feature
-    let isAdmin = false; 
-    let currentTMDBMovie = null; 
-    let currentTMDBType = 'movie'; 
-
     // REAL-TIME FIRESTORE LISTENER
     db.collection("movies").onSnapshot((snapshot) => {
       movies = [];
       snapshot.forEach((doc) => {
         movies.push({ id: doc.id, ...doc.data() });
       });
-
+      // Sort by newest first
       movies.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
       renderHero();
@@ -308,14 +346,12 @@
       console.error("Firebase Error:", error);
     });
 
-    // ADMIN LOGIN CHECK (Type xxxxx in search)
+    // OPEN ADMIN PANEL VIA SEARCH
     function handleSearch(val) {
       if (val.toLowerCase() === 'xxxxx') {
         document.getElementById('searchInput').value = '';
         const pwd = prompt("Enter Admin Password:");
         if (pwd === "1234") {
-          isAdmin = true;
-          alert("Admin Mode ON! Ab aapko nayi movies par 'Add Movie' ka button dikhega.");
           openAdminPanel();
         } else if (pwd !== null) {
           alert("Incorrect Password!");
@@ -326,194 +362,38 @@
       renderGrid();
     }
 
-    // CATEGORY CHANGE FUNCTION
-    function changeCategory(catName, el) {
-      selectedCategory = catName;
-      
-      // Update UI Chips
-      const chips = document.querySelectorAll('.filter-section .chip');
+    // HOME PAGE FILTERS
+    function filterHomeCategory(catName, el) {
+      homeSelectedCategory = catName;
+      const chips = document.getElementById('homeCatChips').querySelectorAll('.chip');
       chips.forEach(c => c.classList.remove('active'));
       el.classList.add('active');
-
-      // Update Section Title
-      document.getElementById('tmdbSectionTitle').innerHTML = `Best of <span>${catName}</span>`;
-
-      // Fetch New Data from TMDB & Filter Firebase
-      fetchTMDBData(catName);
       renderGrid();
     }
 
-    // TMDB DATA FETCHING (Dynamic based on Category)
-    async function fetchTMDBData(category) {
-      let url = '';
-      currentTMDBType = 'movie'; // Default
-
-      switch(category) {
-        case 'Trending':
-          url = `https://api.themoviedb.org/3/trending/all/day?api_key=${TMDB_API_KEY}`;
-          break;
-        case 'Hollywood':
-          url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=US&sort_by=popularity.desc`;
-          break;
-        case 'Bollywood':
-          url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=IN&with_original_language=hi&sort_by=popularity.desc`;
-          break;
-        case 'Tollywood':
-          url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=IN&with_original_language=te&sort_by=popularity.desc`;
-          break;
-        case 'Kollywood':
-          url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=IN&with_original_language=ta&sort_by=popularity.desc`;
-          break;
-        case 'Malayalam':
-          url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=IN&with_original_language=ml&sort_by=popularity.desc`;
-          break;
-        case 'Kannada':
-          url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=IN&with_original_language=kn&sort_by=popularity.desc`;
-          break;
-        case 'Web Series':
-          currentTMDBType = 'tv';
-          url = `https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&with_origin_country=IN&sort_by=popularity.desc`;
-          break;
-      }
-
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        const tmdbGrid = document.getElementById('tmdbGrid');
-        tmdbGrid.innerHTML = '';
-
-        data.results.forEach(m => {
-          if(!m.poster_path) return;
-          
-          // TMDB structure differences for TV vs Movie
-          const title = m.title || m.name;
-          const releaseDate = m.release_date || m.first_air_date || 'N/A';
-          const mediaType = m.media_type || currentTMDBType; 
-
-          const card = document.createElement('div');
-          card.className = 'tmdb-card';
-          card.onclick = () => openTMDBModal(m.id, mediaType);
-          card.innerHTML = `
-            <span class="card-imdb" style="top:5px; left:5px;">⭐ ${m.vote_average ? m.vote_average.toFixed(1) : 'N/A'}</span>
-            <img src="https://image.tmdb.org/t/p/w500${m.poster_path}" alt="${title}">
-            <div class="tmdb-date">Date: ${releaseDate}</div>
-          `;
-          tmdbGrid.appendChild(card);
-        });
-      } catch (err) {
-        console.log("TMDB Fetch Error:", err);
-      }
+    function filterHomeGenre(genName, el) {
+      homeSelectedGenre = genName;
+      const chips = document.getElementById('homeGenreChips').querySelectorAll('.chip');
+      chips.forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      renderGrid();
     }
 
-    // Call TMDB fetch on initial load
-    fetchTMDBData('Trending');
-
-    // OPEN TMDB MODAL & SHOW ADMIN BUTTON IF LOGGED IN
-    async function openTMDBModal(tmdbId, mediaType) {
-      try {
-        const type = mediaType === 'tv' ? 'tv' : 'movie';
-        const res = await fetch(`https://api.themoviedb.org/3/${type}/${tmdbId}?api_key=${TMDB_API_KEY}&append_to_response=credits,videos`);
-        const data = await res.json();
-
-        currentTMDBMovie = data;
-        currentTMDBType = type; // Save for import logic
-
-        const trailer = data.videos?.results?.find(v => v.type === 'Trailer' && v.site === 'YouTube');
-        const trailerUrl = trailer ? `https://www.youtube.com/embed/${trailer.key}` : '';
-
-        const castList = data.credits?.cast?.slice(0, 4).map(c => c.name).join(', ');
-        
-        const displayTitle = data.title || data.name;
-        const displayDate = data.release_date || data.first_air_date || 'N/A';
-        const displayStatus = data.status || 'Upcoming';
-
-        document.getElementById('mDetailTitle').innerText = displayTitle;
-        document.getElementById('mDetailImdb').innerText = `⭐ IMDb ${data.vote_average ? data.vote_average.toFixed(1) : 'N/A'}`;
-        document.getElementById('mDetailCat').innerText = type === 'tv' ? 'Web Series' : 'Movie';
-        document.getElementById('mDetailCast').innerText = castList || 'Not available';
-        document.getElementById('mDetailDesc').innerText = data.overview || 'No storyline provided.';
-
-        // Admin 'Add Content' Button Logic
-        let adminButtonHtml = '';
-        if (isAdmin === true) {
-          adminButtonHtml = `
-            <button onclick="importTMDBData()" style="background:#2563eb; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:14px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); margin-top: 15px;">
-              ➕ Add To Library
-            </button>
-          `;
-        }
-
-        document.getElementById('iframeContainer').innerHTML = `
-          <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#000; text-align:center;">
-            <h2 style="color:#E50914;">${displayStatus}</h2>
-            <p style="color:#aaa; margin-top:10px;">Date: ${displayDate}</p>
-            ${adminButtonHtml}
-          </div>
-        `;
-        document.getElementById('serverSwitchBox').style.display = 'none';
-
-        if (trailerUrl) {
-          document.getElementById('trailerBox').style.display = 'block';
-          document.getElementById('trailerContainer').innerHTML = `<iframe class="trailer-frame" src="${trailerUrl}" allowfullscreen></iframe>`;
-        } else {
-          document.getElementById('trailerBox').style.display = 'none';
-          document.getElementById('trailerContainer').innerHTML = '';
-        }
-
-        document.getElementById('playerModal').style.display = 'flex';
-      } catch (err) {
-        alert("Details load nahi ho paayin.");
-      }
-    }
-
-    // IMPORT DATA TO ADMIN PANEL
-    function importTMDBData() {
-      if(!currentTMDBMovie) return;
-      closePlayer();
-      openAdminPanel();
-      
-      const title = currentTMDBMovie.title || currentTMDBMovie.name || '';
-      document.getElementById('titleInput').value = title;
-      document.getElementById('imdbInput').value = currentTMDBMovie.vote_average ? currentTMDBMovie.vote_average.toFixed(1) : '';
-      
-      // Select best category guess
-      let catValue = 'Hollywood';
-      if (currentTMDBType === 'tv') catValue = 'Web Series';
-      else if (selectedCategory !== 'Trending') catValue = selectedCategory; // Use currently active tab
-      else if (currentTMDBMovie.original_language === 'hi') catValue = 'Bollywood';
-      else if (currentTMDBMovie.original_language === 'te') catValue = 'Tollywood';
-      else if (currentTMDBMovie.original_language === 'ta') catValue = 'Kollywood';
-      document.getElementById('catInput').value = catValue;
-
-      const castList = currentTMDBMovie.credits?.cast?.slice(0, 4).map(c => c.name).join(', ') || '';
-      document.getElementById('castInput').value = castList;
-      document.getElementById('descInput').value = currentTMDBMovie.overview || '';
-      document.getElementById('posterInput').value = currentTMDBMovie.poster_path ? `https://image.tmdb.org/t/p/w500${currentTMDBMovie.poster_path}` : '';
-      
-      const trailer = currentTMDBMovie.videos?.results?.find(v => v.type === 'Trailer' && v.site === 'YouTube');
-      document.getElementById('trailerInput').value = trailer ? `https://www.youtube.com/embed/${trailer.key}` : '';
-
-      document.getElementById('okruInput').value = '';
-      document.getElementById('streamInput').value = '';
-      
-      alert("✅ Data aa gaya hai! Apna Video link daalein aur Save karein.");
-    }
-
-    // RENDER FIREBASE GRID
+    // RENDER FIREBASE GRID (HOME PAGE)
     function renderGrid() {
       const grid = document.getElementById('movieGrid');
       const searchQuery = document.getElementById('searchInput').value.toLowerCase();
       grid.innerHTML = '';
 
       const filtered = movies.filter(m => {
-        // Find matching category (Show all if 'Trending' is selected)
-        const matchesCat = (selectedCategory === 'Trending' || m.category === selectedCategory || m.category === 'All');
+        const matchesCat = (homeSelectedCategory === 'All' || m.category === homeSelectedCategory);
+        const matchesGenre = (homeSelectedGenre === 'All' || m.genre === homeSelectedGenre);
         const matchesSearch = (m.title || '').toLowerCase().includes(searchQuery);
-        return matchesCat && matchesSearch;
+        return matchesCat && matchesGenre && matchesSearch;
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = '<p style="color:#555; grid-column: 1/-1;">Is category me koi content nahi hai.</p>';
+        grid.innerHTML = '<p style="color:#555; grid-column: 1/-1;">No movies found in this section.</p>';
         return;
       }
 
@@ -532,6 +412,162 @@
       });
     }
 
+    // ==========================================
+    // ADMIN PANEL & TMDB IMPORT LOGIC
+    // ==========================================
+
+    let currentAdminTMDBType = 'movie';
+
+    function openAdminPanel() {
+      editDocId = null;
+      document.getElementById('adminModalTitle').innerText = "📝 Add New Content";
+      resetAdminForm();
+      renderAdminList();
+      fetchAdminTMDB('Trending', document.querySelector('#adminTmdbChips .chip')); // Load trending by default
+      document.getElementById('adminPanel').style.display = 'flex';
+    }
+
+    function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
+
+    async function fetchAdminTMDB(category, el) {
+      // Update UI Chips in Admin
+      const chips = document.getElementById('adminTmdbChips').querySelectorAll('.chip');
+      chips.forEach(c => c.classList.remove('active'));
+      if(el) el.classList.add('active');
+
+      let url = '';
+      currentAdminTMDBType = 'movie'; 
+
+      switch(category) {
+        case 'Trending': url = `https://api.themoviedb.org/3/trending/all/day?api_key=${TMDB_API_KEY}`; break;
+        case 'Hollywood': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=US&sort_by=popularity.desc`; break;
+        case 'Bollywood': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=IN&with_original_language=hi&sort_by=popularity.desc`; break;
+        case 'Tollywood': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=IN&with_original_language=te&sort_by=popularity.desc`; break;
+        case 'Kollywood': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=IN&with_original_language=ta&sort_by=popularity.desc`; break;
+        case 'Malayalam': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=IN&with_original_language=ml&sort_by=popularity.desc`; break;
+        case 'Kannada': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=IN&with_original_language=kn&sort_by=popularity.desc`; break;
+        case 'Animation': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_genres=16&sort_by=popularity.desc`; break;
+        case 'Web Series': 
+          currentAdminTMDBType = 'tv';
+          url = `https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&with_origin_country=IN&sort_by=popularity.desc`; 
+          break;
+      }
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const tmdbGrid = document.getElementById('adminTmdbGrid');
+        tmdbGrid.innerHTML = '';
+
+        data.results.forEach(m => {
+          if(!m.poster_path) return;
+          const mediaType = m.media_type || currentAdminTMDBType; 
+          const title = m.title || m.name;
+
+          const card = document.createElement('div');
+          card.className = 'tmdb-card';
+          card.onclick = () => autoFillAdminForm(m.id, mediaType, category);
+          card.innerHTML = `
+            <span class="card-imdb" style="top:5px; left:5px;">⭐ ${m.vote_average ? m.vote_average.toFixed(1) : 'N/A'}</span>
+            <img src="https://image.tmdb.org/t/p/w500${m.poster_path}" alt="${title}">
+            <div class="import-badge">⬇️ CLICK TO ADD</div>
+          `;
+          tmdbGrid.appendChild(card);
+        });
+      } catch (err) {
+        console.log("Admin TMDB Fetch Error:", err);
+      }
+    }
+
+    // CLICK TMDB MOVIE -> FILL FORM INSTANTLY
+    async function autoFillAdminForm(tmdbId, mediaType, srcCategory) {
+      try {
+        const type = mediaType === 'tv' ? 'tv' : 'movie';
+        const res = await fetch(`https://api.themoviedb.org/3/${type}/${tmdbId}?api_key=${TMDB_API_KEY}&append_to_response=credits,videos`);
+        const data = await res.json();
+
+        document.getElementById('titleInput').value = data.title || data.name || '';
+        document.getElementById('imdbInput').value = data.vote_average ? data.vote_average.toFixed(1) : '';
+        
+        // Guess Category based on tab clicked
+        let catValue = srcCategory;
+        if (srcCategory === 'Trending') {
+           catValue = type === 'tv' ? 'Web Series' : (data.original_language === 'hi' ? 'Bollywood' : 'Hollywood');
+        }
+        document.getElementById('catInput').value = catValue;
+
+        // Auto select Genre based on TMDB first genre
+        if (data.genres && data.genres.length > 0) {
+          const tmdbGen = data.genres[0].name;
+          const options = Array.from(document.getElementById('genreInput').options).map(o => o.value);
+          if (options.includes(tmdbGen)) {
+            document.getElementById('genreInput').value = tmdbGen;
+          } else {
+             document.getElementById('genreInput').value = 'Action'; // Default fallback
+          }
+        }
+
+        const castList = data.credits?.cast?.slice(0, 4).map(c => c.name).join(', ') || '';
+        document.getElementById('castInput').value = castList;
+        document.getElementById('descInput').value = data.overview || '';
+        document.getElementById('posterInput').value = data.poster_path ? `https://image.tmdb.org/t/p/w500${data.poster_path}` : '';
+        
+        const trailer = data.videos?.results?.find(v => v.type === 'Trailer' && v.site === 'YouTube');
+        document.getElementById('trailerInput').value = trailer ? `https://www.youtube.com/embed/${trailer.key}` : '';
+
+        // Leave video links empty for manual entry
+        document.getElementById('okruInput').value = '';
+        document.getElementById('streamInput').value = '';
+        
+        // Scroll to form slightly
+        document.getElementById('adminModalTitle').scrollIntoView({ behavior: 'smooth' });
+        
+      } catch (err) {
+        alert("Failed to fetch full details.");
+      }
+    }
+
+    // ==========================================
+    // SAVE TO FIREBASE & PLAY LOGIC
+    // ==========================================
+
+    async function saveMovie() {
+      const title = document.getElementById('titleInput').value.trim();
+      const imdb = document.getElementById('imdbInput').value.trim();
+      const category = document.getElementById('catInput').value;
+      const genre = document.getElementById('genreInput').value; // Saved Genre
+      const cast = document.getElementById('castInput').value.trim();
+      const desc = document.getElementById('descInput').value.trim();
+      const poster = document.getElementById('posterInput').value.trim();
+      const okruUrl = fixOkruUrl(document.getElementById('okruInput').value);
+      const streamUrl = fixStreamtapeUrl(document.getElementById('streamInput').value);
+      const trailerUrl = fixYoutubeLink(document.getElementById('trailerInput').value);
+
+      if (!title || !poster) { alert('Title and Poster Link are required!'); return; }
+
+      const movieData = {
+        title, imdb, category, genre, cast, desc, poster,
+        okruUrl, streamUrl, trailerUrl,
+        updatedAt: new Date().toISOString()
+      };
+
+      try {
+        if (editDocId) {
+          await db.collection("movies").doc(editDocId).update(movieData);
+          alert('Updated Successfully!');
+        } else {
+          movieData.createdAt = new Date().toISOString();
+          await db.collection("movies").add(movieData);
+          alert('Saved Successfully! Check Home Page.');
+        }
+        resetAdminForm();
+        editDocId = null;
+        document.getElementById('adminModalTitle').innerText = "📝 Add New Content";
+      } catch (error) {
+        alert("Save Error: " + error.message);
+      }
+    }
+
     // PLAY FIREBASE MOVIE
     function playFirebaseMovie(id) {
       activeMovieObj = movies.find(m => m.id === id);
@@ -543,6 +579,7 @@
       document.getElementById('mDetailTitle').innerText = activeMovieObj.title;
       document.getElementById('mDetailImdb').innerText = `⭐ IMDb ${activeMovieObj.imdb || 'N/A'}`;
       document.getElementById('mDetailCat').innerText = activeMovieObj.category || 'All';
+      document.getElementById('mDetailGenre').innerText = activeMovieObj.genre || 'Action';
       document.getElementById('mDetailCast').innerText = activeMovieObj.cast || 'Actors detail not added.';
       document.getElementById('mDetailDesc').innerText = activeMovieObj.desc || 'No storyline provided.';
 
@@ -580,16 +617,7 @@
       }
     }
 
-    // UTILITIES & ADMIN FUNCTIONS
-    function openAdminPanel() {
-      editDocId = null;
-      document.getElementById('adminModalTitle').innerText = "Add New Content";
-      resetAdminForm();
-      renderAdminList();
-      document.getElementById('adminPanel').style.display = 'flex';
-    }
-
-    function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
+    // UTILITIES
     function closePlayer() { 
       document.getElementById('playerModal').style.display = 'none';
       document.getElementById('iframeContainer').innerHTML = '';
@@ -605,6 +633,7 @@
       document.getElementById('okruInput').value = '';
       document.getElementById('streamInput').value = '';
       document.getElementById('trailerInput').value = '';
+      document.getElementById('genreInput').value = 'Action';
     }
 
     function fixOkruUrl(url) {
@@ -684,53 +713,19 @@
       const m = movies.find(item => item.id === id);
       if(!m) return;
       editDocId = id;
-      document.getElementById('adminModalTitle').innerText = "Edit Content";
+      document.getElementById('adminModalTitle').innerText = "📝 Edit Content";
       document.getElementById('titleInput').value = m.title || '';
       document.getElementById('imdbInput').value = m.imdb || '';
       document.getElementById('catInput').value = m.category || 'Hollywood';
+      document.getElementById('genreInput').value = m.genre || 'Action';
       document.getElementById('castInput').value = m.cast || '';
       document.getElementById('descInput').value = m.desc || '';
       document.getElementById('posterInput').value = m.poster || '';
       document.getElementById('okruInput').value = m.okruUrl || '';
       document.getElementById('streamInput').value = m.streamUrl || '';
       document.getElementById('trailerInput').value = m.trailerUrl || '';
-    }
-
-    async function saveMovie() {
-      const title = document.getElementById('titleInput').value.trim();
-      const imdb = document.getElementById('imdbInput').value.trim();
-      const category = document.getElementById('catInput').value;
-      const cast = document.getElementById('castInput').value.trim();
-      const desc = document.getElementById('descInput').value.trim();
-      const poster = document.getElementById('posterInput').value.trim();
-      const okruUrl = fixOkruUrl(document.getElementById('okruInput').value);
-      const streamUrl = fixStreamtapeUrl(document.getElementById('streamInput').value);
-      const trailerUrl = fixYoutubeLink(document.getElementById('trailerInput').value);
-
-      if (!title || !poster) { alert('Title aur Poster Link zaroori hai!'); return; }
-
-      const movieData = {
-        title, imdb, category, cast, desc, poster,
-        okruUrl, streamUrl, trailerUrl,
-        updatedAt: new Date().toISOString()
-      };
-
-      try {
-        if (editDocId) {
-          await db.collection("movies").doc(editDocId).update(movieData);
-          alert('Successfully updated!');
-        } else {
-          movieData.createdAt = new Date().toISOString();
-          await db.collection("movies").add(movieData);
-          alert('Successfully Saved to Firebase!');
-        }
-
-        resetAdminForm();
-        editDocId = null;
-        document.getElementById('adminModalTitle').innerText = "Add New Content";
-      } catch (error) {
-        alert("Save Error: " + error.message);
-      }
+      
+      document.getElementById('adminModalTitle').scrollIntoView({ behavior: 'smooth' });
     }
 
     async function deleteMovie(id) {
