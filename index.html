@@ -127,12 +127,15 @@
     <!-- Categories -->
     <div class="chips-row" id="homeCatChips">
       <div class="chip active" onclick="filterHomeCategory('All', this)">All</div>
+      <div class="chip" onclick="filterHomeCategory('Marvel', this)">Marvel</div>
+      <div class="chip" onclick="filterHomeCategory('DC', this)">DC</div>
       <div class="chip" onclick="filterHomeCategory('Hollywood', this)">Hollywood</div>
       <div class="chip" onclick="filterHomeCategory('Bollywood', this)">Bollywood</div>
       <div class="chip" onclick="filterHomeCategory('Tollywood', this)">Tollywood</div>
       <div class="chip" onclick="filterHomeCategory('Kollywood', this)">Kollywood</div>
       <div class="chip" onclick="filterHomeCategory('Malayalam', this)">Malayalam</div>
       <div class="chip" onclick="filterHomeCategory('Kannada', this)">Kannada</div>
+      <div class="chip" onclick="filterHomeCategory('Anime', this)">Anime</div>
       <div class="chip" onclick="filterHomeCategory('Animation', this)">Animation</div>
       <div class="chip" onclick="filterHomeCategory('Web Series', this)">📺 Web Series</div>
     </div>
@@ -166,10 +169,11 @@
       
       <div id="iframeContainer"></div>
 
+      <!-- Server 1 & Server 2 swapped here -->
       <div class="server-switch-box" id="serverSwitchBox">
         <span style="font-size:12px; color:#aaa; font-weight:bold;">SERVERS:</span>
-        <button class="server-btn active" id="btnServer1" onclick="switchServer(1)">🌐 Server 1 (Ok.ru)</button>
-        <button class="server-btn" id="btnServer2" onclick="switchServer(2)">📼 Server 2 (Streamtape)</button>
+        <button class="server-btn active" id="btnServer1" onclick="switchServer(1)">📼 Server 1 (Streamtape)</button>
+        <button class="server-btn" id="btnServer2" onclick="switchServer(2)">🌐 Server 2 (Ok.ru)</button>
       </div>
       
       <div class="movie-detail-body">
@@ -207,12 +211,15 @@
       <h3 style="color:#2563eb;">🔍 Find & Import from TMDB</h3>
       <div class="chips-row" style="margin-bottom:10px;" id="adminTmdbChips">
         <div class="chip active" onclick="fetchAdminTMDB('Trending', this)">🔥 Trending</div>
+        <div class="chip" onclick="fetchAdminTMDB('Marvel', this)">Marvel</div>
+        <div class="chip" onclick="fetchAdminTMDB('DC', this)">DC</div>
         <div class="chip" onclick="fetchAdminTMDB('Hollywood', this)">Hollywood</div>
         <div class="chip" onclick="fetchAdminTMDB('Bollywood', this)">Bollywood</div>
         <div class="chip" onclick="fetchAdminTMDB('Tollywood', this)">Tollywood</div>
         <div class="chip" onclick="fetchAdminTMDB('Kollywood', this)">Kollywood</div>
         <div class="chip" onclick="fetchAdminTMDB('Malayalam', this)">Malayalam</div>
         <div class="chip" onclick="fetchAdminTMDB('Kannada', this)">Kannada</div>
+        <div class="chip" onclick="fetchAdminTMDB('Anime', this)">Anime</div>
         <div class="chip" onclick="fetchAdminTMDB('Animation', this)">Animation</div>
         <div class="chip" onclick="fetchAdminTMDB('Web Series', this)">📺 Web Series</div>
       </div>
@@ -239,11 +246,14 @@
         <div style="display:flex; gap:10px;">
           <select id="catInput">
             <option value="Hollywood">Hollywood</option>
+            <option value="Marvel">Marvel</option>
+            <option value="DC">DC</option>
             <option value="Bollywood">Bollywood</option>
             <option value="Tollywood">Tollywood</option>
             <option value="Kollywood">Kollywood</option>
             <option value="Malayalam">Malayalam</option>
             <option value="Kannada">Kannada</option>
+            <option value="Anime">Anime</option>
             <option value="Animation">Animation</option>
             <option value="Web Series">Web Series</option>
           </select>
@@ -272,14 +282,14 @@
         <input type="text" id="posterInput" placeholder="https://image.tmdb.org/...">
       </div>
       
-      <!-- VIDEO LINKS -->
+      <!-- VIDEO LINKS (Server 1 Streamtape, Server 2 Ok.ru) -->
       <div class="input-group">
-        <label style="color:#3b82f6;">Ok.ru Link / Embed Code (Server 1)</label>
-        <input type="text" id="okruInput" placeholder="https://ok.ru/videoembed/... ya iframe code">
+        <label style="color:#f59e0b;">Streamtape Link / Embed Code (Server 1)</label>
+        <input type="text" id="streamInput" placeholder="https://streamtape.com/e/... ya iframe code">
       </div>
       <div class="input-group">
-        <label style="color:#f59e0b;">Streamtape Link / Embed Code (Server 2)</label>
-        <input type="text" id="streamInput" placeholder="https://streamtape.com/e/... ya iframe code">
+        <label style="color:#3b82f6;">Ok.ru Link / Embed Code (Server 2)</label>
+        <input type="text" id="okruInput" placeholder="https://ok.ru/videoembed/... ya iframe code">
       </div>
 
       <div class="input-group">
@@ -440,6 +450,8 @@
 
       switch(category) {
         case 'Trending': url = `https://api.themoviedb.org/3/trending/all/day?api_key=${TMDB_API_KEY}`; break;
+        case 'Marvel': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_companies=420&sort_by=popularity.desc`; break;
+        case 'DC': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_companies=9993,12806&sort_by=popularity.desc`; break;
         case 'Hollywood': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=US&sort_by=popularity.desc`; break;
         case 'Bollywood': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=IN&with_original_language=hi&sort_by=popularity.desc`; break;
         case 'Tollywood': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=IN&with_original_language=te&sort_by=popularity.desc`; break;
@@ -447,6 +459,10 @@
         case 'Malayalam': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=IN&with_original_language=ml&sort_by=popularity.desc`; break;
         case 'Kannada': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_origin_country=IN&with_original_language=kn&sort_by=popularity.desc`; break;
         case 'Animation': url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_genres=16&sort_by=popularity.desc`; break;
+        case 'Anime': 
+          currentAdminTMDBType = 'tv';
+          url = `https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&with_genres=16&with_original_language=ja&sort_by=popularity.desc`; 
+          break;
         case 'Web Series': 
           currentAdminTMDBType = 'tv';
           url = `https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&with_origin_country=IN&sort_by=popularity.desc`; 
@@ -600,12 +616,12 @@
       const btn2 = document.getElementById('btnServer2');
 
       let targetUrl = '';
-      if (serverNum === 1) {
-        targetUrl = fixOkruUrl(activeMovieObj.okruUrl || activeMovieObj.streamUrl);
+      if (serverNum === 1) { // 1st is Streamtape now
+        targetUrl = fixStreamtapeUrl(activeMovieObj.streamUrl);
         btn1.classList.add('active');
         btn2.classList.remove('active');
-      } else {
-        targetUrl = fixStreamtapeUrl(activeMovieObj.streamUrl);
+      } else { // 2nd is Ok.ru now
+        targetUrl = fixOkruUrl(activeMovieObj.okruUrl || activeMovieObj.streamUrl);
         btn2.classList.add('active');
         btn1.classList.remove('active');
       }
