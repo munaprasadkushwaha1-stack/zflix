@@ -188,10 +188,11 @@
         <div data-banner-id="2027603"></div>
       </div>
 
+      <!-- Server Switch (Reverted to Original: Server 1 = Ok.ru, Server 2 = Streamtape) -->
       <div class="server-switch-box" id="serverSwitchBox">
         <span style="font-size:12px; color:#aaa; font-weight:bold;">SERVERS:</span>
-        <button class="server-btn active" id="btnServer1" onclick="switchServer(1)">📼 Server 1 (Streamtape)</button>
-        <button class="server-btn" id="btnServer2" onclick="switchServer(2)">🌐 Server 2 (Ok.ru)</button>
+        <button class="server-btn active" id="btnServer1" onclick="switchServer(1)">🌐 Server 1 (Ok.ru)</button>
+        <button class="server-btn" id="btnServer2" onclick="switchServer(2)">📼 Server 2 (Streamtape)</button>
       </div>
       
       <div class="movie-detail-body">
@@ -299,13 +300,14 @@
         <input type="text" id="posterInput" placeholder="https://image.tmdb.org/...">
       </div>
       
+      <!-- Video Input Restored: Ok.ru as Server 1, Streamtape as Server 2 -->
       <div class="input-group">
-        <label style="color:#f59e0b;">Streamtape Link / Embed Code (Server 1)</label>
-        <input type="text" id="streamInput" placeholder="https://streamtape.com/e/... ya iframe code">
+        <label style="color:#3b82f6;">Ok.ru Link / Embed Code (Server 1)</label>
+        <input type="text" id="okruInput" placeholder="https://ok.ru/videoembed/... ya iframe code">
       </div>
       <div class="input-group">
-        <label style="color:#3b82f6;">Ok.ru Link / Embed Code (Server 2)</label>
-        <input type="text" id="okruInput" placeholder="https://ok.ru/videoembed/... ya iframe code">
+        <label style="color:#f59e0b;">Streamtape Link / Embed Code (Server 2)</label>
+        <input type="text" id="streamInput" placeholder="https://streamtape.com/e/... ya iframe code">
       </div>
 
       <div class="input-group">
@@ -398,6 +400,13 @@
       renderGrid();
     }
 
+    // Refresh MyBid Banners dynamically
+    function triggerAdRefresh() {
+      if (window.mybid && typeof window.mybid.refresh === 'function') {
+        window.mybid.refresh();
+      }
+    }
+
     function renderGrid() {
       const grid = document.getElementById('movieGrid');
       const searchQuery = document.getElementById('searchInput').value.toLowerCase();
@@ -416,7 +425,7 @@
       }
 
       filtered.forEach((m, index) => {
-        // Banner #1 inserted in grid every 6 movies
+        // Banner #1 inserted in grid after every 6 movies
         if (index > 0 && index % 6 === 0) {
           const adBox = document.createElement('div');
           adBox.className = 'ad-card-full';
@@ -436,6 +445,8 @@
         `;
         grid.appendChild(card);
       });
+
+      triggerAdRefresh();
     }
 
     let currentAdminTMDBType = 'movie';
@@ -590,7 +601,7 @@
       if (!activeMovieObj) return;
 
       document.getElementById('serverSwitchBox').style.display = 'flex';
-      switchServer(1);
+      switchServer(1); // Defaults to Server 1 (Ok.ru)
 
       document.getElementById('mDetailTitle').innerText = activeMovieObj.title;
       document.getElementById('mDetailImdb').innerText = `⭐ IMDb ${activeMovieObj.imdb || 'N/A'}`;
@@ -608,6 +619,7 @@
       }
 
       document.getElementById('playerModal').style.display = 'flex';
+      triggerAdRefresh();
     }
 
     function switchServer(serverNum) {
@@ -616,12 +628,12 @@
       const btn2 = document.getElementById('btnServer2');
 
       let targetUrl = '';
-      if (serverNum === 1) {
-        targetUrl = fixStreamtapeUrl(activeMovieObj.streamUrl);
+      if (serverNum === 1) { // 1st Server = Ok.ru
+        targetUrl = fixOkruUrl(activeMovieObj.okruUrl || activeMovieObj.streamUrl);
         btn1.classList.add('active');
         btn2.classList.remove('active');
-      } else {
-        targetUrl = fixOkruUrl(activeMovieObj.okruUrl || activeMovieObj.streamUrl);
+      } else { // 2nd Server = Streamtape
+        targetUrl = fixStreamtapeUrl(activeMovieObj.streamUrl);
         btn2.classList.add('active');
         btn1.classList.remove('active');
       }
