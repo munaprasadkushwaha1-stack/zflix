@@ -188,7 +188,7 @@
         <div data-banner-id="2027603"></div>
       </div>
 
-      <!-- Server Switch (Reverted to Original: Server 1 = Ok.ru, Server 2 = Streamtape) -->
+      <!-- Server Switch (Server 1 = Ok.ru, Server 2 = Streamtape) -->
       <div class="server-switch-box" id="serverSwitchBox">
         <span style="font-size:12px; color:#aaa; font-weight:bold;">SERVERS:</span>
         <button class="server-btn active" id="btnServer1" onclick="switchServer(1)">🌐 Server 1 (Ok.ru)</button>
@@ -228,6 +228,20 @@
       
       <!-- TMDB IN ADMIN PANEL -->
       <h3 style="color:#2563eb;">🔍 Find & Import from TMDB</h3>
+
+      <!-- NEW: Manual TMDB Code / ID Fetch Box -->
+      <div style="background:#0b0c10; padding:12px; border-radius:8px; border:1px solid #222630; margin-bottom:15px;">
+        <label style="font-size:11px; color:#3b82f6; font-weight:bold; text-transform:uppercase; display:block; margin-bottom:6px;">⚡ Enter Manual TMDB ID / Code</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="manualTmdbId" placeholder="e.g. 299536 or 105" style="flex:1; padding:8px 12px; border-radius:5px; border:1px solid #222630; background:#16181f; color:#fff; font-size:13px; outline:none;">
+          <select id="manualTmdbType" style="padding:8px 10px; border-radius:5px; border:1px solid #222630; background:#16181f; color:#fff; font-size:12px; outline:none;">
+            <option value="movie">Movie</option>
+            <option value="tv">Web Series / TV</option>
+          </select>
+          <button type="button" onclick="fetchManualTMDB()" style="background:#2563eb; color:#fff; border:none; padding:8px 16px; border-radius:5px; font-weight:bold; font-size:12px; cursor:pointer;">Fetch Data</button>
+        </div>
+      </div>
+
       <div class="chips-row" style="margin-bottom:10px;" id="adminTmdbChips">
         <div class="chip active" onclick="fetchAdminTMDB('Trending', this)">🔥 Trending</div>
         <div class="chip" onclick="fetchAdminTMDB('Marvel', this)">Marvel</div>
@@ -300,7 +314,7 @@
         <input type="text" id="posterInput" placeholder="https://image.tmdb.org/...">
       </div>
       
-      <!-- Video Input Restored: Ok.ru as Server 1, Streamtape as Server 2 -->
+      <!-- Video Input: Ok.ru Server 1, Streamtape Server 2 -->
       <div class="input-group">
         <label style="color:#3b82f6;">Ok.ru Link / Embed Code (Server 1)</label>
         <input type="text" id="okruInput" placeholder="https://ok.ru/videoembed/... ya iframe code">
@@ -400,7 +414,6 @@
       renderGrid();
     }
 
-    // Refresh MyBid Banners dynamically
     function triggerAdRefresh() {
       if (window.mybid && typeof window.mybid.refresh === 'function') {
         window.mybid.refresh();
@@ -425,7 +438,6 @@
       }
 
       filtered.forEach((m, index) => {
-        // Banner #1 inserted in grid after every 6 movies
         if (index > 0 && index % 6 === 0) {
           const adBox = document.createElement('div');
           adBox.className = 'ad-card-full';
@@ -517,21 +529,53 @@
       }
     }
 
+    // FUNCTION FOR MANUAL TMDB ID LOOKUP
+    async function fetchManualTMDB() {
+      const tmdbId = document.getElementById('manualTmdbId').value.trim();
+      const type = document.getElementById('manualTmdbType').value;
+
+      if (!tmdbId) {
+        alert("Please enter a valid TMDB ID / Code first!");
+        return;
+      }
+
+      await autoFillAdminForm(tmdbId, type, 'Manual');
+    }
+
+    // AUTOFILL FUNCTION (Used by both Click & Manual ID)
     async function autoFillAdminForm(tmdbId, mediaType, srcCategory) {
       try {
         const type = mediaType === 'tv' ? 'tv' : 'movie';
         const res = await fetch(`https://api.themoviedb.org/3/${type}/${tmdbId}?api_key=${TMDB_API_KEY}&append_to_response=credits,videos`);
         const data = await res.json();
 
+        if (!data || data.status_code === 34) {
+          alert("TMDB ID not found. Please check the ID and Type.");
+          return;
+        }
+
         document.getElementById('titleInput').value = data.title || data.name || '';
         document.getElementById('imdbInput').value = data.vote_average ? data.vote_average.toFixed(1) : '';
         
+        // Smart Category Detection
         let catValue = srcCategory;
-        if (srcCategory === 'Trending') {
-           catValue = type === 'tv' ? 'Web Series' : (data.original_language === 'hi' ? 'Bollywood' : 'Hollywood');
+        const isMarvel = (data.production_companies || []).some(c => c.id === 420 || c.name.toLowerCase().includes('marvel'));
+        const isDC = (data.production_companies || []).some(c => c.id === 9993 || c.id === 12806 || c.name.toLowerCase().includes('dc'));
+
+        if (isMarvel) {
+          catValue = 'Marvel';
+        } else if (isDC) {
+          catValue = 'DC';
+        } else if (srcCategory === 'Trending' || srcCategory === 'Manual') {
+          if (type === 'tv') {
+            catValue = (data.original_language === 'ja') ? 'Anime' : 'Web Series';
+          } else {
+            catValue = (data.original_language === 'hi') ? 'Bollywood' : (data.original_language === 'te' ? 'Tollywood' : (data.original_language === 'ta' ? 'Kollywood' : 'Hollywood'));
+          }
         }
         document.getElementById('catInput').value = catValue;
 
+        // Auto Select Genre
         if (data.genres && data.genres.length > 0) {
           const tmdbGen = data.genres[0].name;
           const options = Array.from(document.getElementById('genreInput').options).map(o => o.value);
@@ -555,7 +599,7 @@
         
         document.getElementById('adminModalTitle').scrollIntoView({ behavior: 'smooth' });
       } catch (err) {
-        alert("Failed to fetch full details.");
+        alert("Failed to fetch details for TMDB ID: " + tmdbId);
       }
     }
 
@@ -601,7 +645,7 @@
       if (!activeMovieObj) return;
 
       document.getElementById('serverSwitchBox').style.display = 'flex';
-      switchServer(1); // Defaults to Server 1 (Ok.ru)
+      switchServer(1);
 
       document.getElementById('mDetailTitle').innerText = activeMovieObj.title;
       document.getElementById('mDetailImdb').innerText = `⭐ IMDb ${activeMovieObj.imdb || 'N/A'}`;
@@ -628,11 +672,11 @@
       const btn2 = document.getElementById('btnServer2');
 
       let targetUrl = '';
-      if (serverNum === 1) { // 1st Server = Ok.ru
+      if (serverNum === 1) {
         targetUrl = fixOkruUrl(activeMovieObj.okruUrl || activeMovieObj.streamUrl);
         btn1.classList.add('active');
         btn2.classList.remove('active');
-      } else { // 2nd Server = Streamtape
+      } else {
         targetUrl = fixStreamtapeUrl(activeMovieObj.streamUrl);
         btn2.classList.add('active');
         btn1.classList.remove('active');
@@ -661,6 +705,7 @@
       document.getElementById('streamInput').value = '';
       document.getElementById('trailerInput').value = '';
       document.getElementById('genreInput').value = 'Action';
+      if(document.getElementById('manualTmdbId')) document.getElementById('manualTmdbId').value = '';
     }
 
     function fixOkruUrl(url) {
