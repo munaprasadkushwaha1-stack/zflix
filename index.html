@@ -7,6 +7,8 @@
   
   <!-- MyBid Video Overlay Ad Code -->
   <script async src="https://js.mbidadm.com/static/scripts.js" data-admpid="461536"></script>
+  <!-- MyBid Banners Script -->
+  <script async src="https://js.mbidadm.com/static/scripts.js" data-admpid="461549"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,7 +41,7 @@
     .chip { background: #16181f; color: #aaa; border: 1px solid #222630; padding: 7px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
     .chip.active { background: #E50914; color: #fff; border-color: #E50914; }
 
-    /* Movie Grid (Vertical Scroll Only) */
+    /* Movie Grid */
     .main-container { padding: 20px 5%; }
     .section-title { font-size: 18px; margin-bottom: 15px; }
     .section-title span { color: #E50914; }
@@ -50,6 +52,11 @@
     .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .card-imdb { position: absolute; top: 5px; left: 5px; background: rgba(245, 197, 24, 0.95); color: #000; font-weight: 900; font-size: 10px; padding: 2px 6px; border-radius: 3px; z-index: 4; }
     .card-title { padding: 8px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
+
+    /* Ad Banner Container */
+    .ad-card-full { grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; margin: 15px 0; min-height: 250px; width: 100%; overflow: hidden; }
+    .bottom-banner-wrap { display: flex; justify-content: center; align-items: center; margin: 30px 5% 0; min-height: 250px; }
+    .player-ad-wrap { display: flex; justify-content: center; align-items: center; padding: 15px 0; background: #0b0c10; border-bottom: 1px solid #222630; min-height: 250px; }
 
     /* Footer */
     footer { text-align: center; font-size: 12px; color: #555; margin-top: 40px; }
@@ -126,9 +133,8 @@
     </div>
   </div>
 
-  <!-- Category & Genre Chips (For Home Page Filter) -->
+  <!-- Category & Genre Chips -->
   <div class="filter-section">
-    <!-- Categories -->
     <div class="chips-row" id="homeCatChips">
       <div class="chip active" onclick="filterHomeCategory('All', this)">All</div>
       <div class="chip" onclick="filterHomeCategory('Marvel', this)">Marvel</div>
@@ -143,7 +149,6 @@
       <div class="chip" onclick="filterHomeCategory('Animation', this)">Animation</div>
       <div class="chip" onclick="filterHomeCategory('Web Series', this)">📺 Web Series</div>
     </div>
-    <!-- Genres -->
     <div class="chips-row" id="homeGenreChips">
       <div class="chip active" onclick="filterHomeGenre('All', this)">All Genres</div>
       <div class="chip" onclick="filterHomeGenre('Action', this)">Action</div>
@@ -156,10 +161,15 @@
     </div>
   </div>
 
-  <!-- Movie Grid (Only Shows Firebase Library) -->
+  <!-- Movie Grid -->
   <div class="main-container">
     <div class="section-title">My <span>Library</span></div>
     <div class="grid" id="movieGrid"></div>
+  </div>
+
+  <!-- Banner #3 (Bottom of Library) -->
+  <div class="bottom-banner-wrap">
+    <div data-banner-id="2027604"></div>
   </div>
 
   <footer>
@@ -173,7 +183,11 @@
       
       <div id="iframeContainer"></div>
 
-      <!-- Server 1 & Server 2 swapped here -->
+      <!-- Banner #2 (Under Video Player) -->
+      <div class="player-ad-wrap">
+        <div data-banner-id="2027603"></div>
+      </div>
+
       <div class="server-switch-box" id="serverSwitchBox">
         <span style="font-size:12px; color:#aaa; font-weight:bold;">SERVERS:</span>
         <button class="server-btn active" id="btnServer1" onclick="switchServer(1)">📼 Server 1 (Streamtape)</button>
@@ -227,7 +241,6 @@
         <div class="chip" onclick="fetchAdminTMDB('Animation', this)">Animation</div>
         <div class="chip" onclick="fetchAdminTMDB('Web Series', this)">📺 Web Series</div>
       </div>
-      <!-- TMDB Results Scroll -->
       <div class="tmdb-scroll" id="adminTmdbGrid">
         <p style="color:#555; padding:10px;">Select a category above to load movies.</p>
       </div>
@@ -286,7 +299,6 @@
         <input type="text" id="posterInput" placeholder="https://image.tmdb.org/...">
       </div>
       
-      <!-- VIDEO LINKS (Server 1 Streamtape, Server 2 Ok.ru) -->
       <div class="input-group">
         <label style="color:#f59e0b;">Streamtape Link / Embed Code (Server 1)</label>
         <input type="text" id="streamInput" placeholder="https://streamtape.com/e/... ya iframe code">
@@ -303,7 +315,6 @@
       
       <button class="save-btn" onclick="saveMovie()">Save To My Website</button>
 
-      <!-- Manage Existing Data -->
       <div class="admin-list">
         <h4 style="color:#aaa; margin-bottom:10px; font-size:13px;">Manage Library (Edit / Delete)</h4>
         <div id="adminMovieList"></div>
@@ -316,7 +327,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
   <script>
-    // Firebase Config (Do not change)
     const firebaseConfig = {
       apiKey: "AIzaSyA2yXT2VlPBhGo59i_DX5fkNHyLqEPxZ8E",
       authDomain: "zflixhub.firebaseapp.com",
@@ -335,20 +345,17 @@
     let movies = [];
     let currentSlide = 0;
     
-    // Home Page Filters
     let homeSelectedCategory = 'All';
     let homeSelectedGenre = 'All';
     
     let editDocId = null;
     let activeMovieObj = null;
     
-    // REAL-TIME FIRESTORE LISTENER
     db.collection("movies").onSnapshot((snapshot) => {
       movies = [];
       snapshot.forEach((doc) => {
         movies.push({ id: doc.id, ...doc.data() });
       });
-      // Sort by newest first
       movies.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
       renderHero();
@@ -360,7 +367,6 @@
       console.error("Firebase Error:", error);
     });
 
-    // OPEN ADMIN PANEL VIA SEARCH
     function handleSearch(val) {
       if (val.toLowerCase() === 'xxxxx') {
         document.getElementById('searchInput').value = '';
@@ -376,7 +382,6 @@
       renderGrid();
     }
 
-    // HOME PAGE FILTERS
     function filterHomeCategory(catName, el) {
       homeSelectedCategory = catName;
       const chips = document.getElementById('homeCatChips').querySelectorAll('.chip');
@@ -393,7 +398,6 @@
       renderGrid();
     }
 
-    // RENDER FIREBASE GRID (HOME PAGE)
     function renderGrid() {
       const grid = document.getElementById('movieGrid');
       const searchQuery = document.getElementById('searchInput').value.toLowerCase();
@@ -411,7 +415,15 @@
         return;
       }
 
-      filtered.forEach((m) => {
+      filtered.forEach((m, index) => {
+        // Banner #1 inserted in grid every 6 movies
+        if (index > 0 && index % 6 === 0) {
+          const adBox = document.createElement('div');
+          adBox.className = 'ad-card-full';
+          adBox.innerHTML = '<div data-banner-id="2027602"></div>';
+          grid.appendChild(adBox);
+        }
+
         const card = document.createElement('div');
         card.className = 'card';
         card.onclick = () => playFirebaseMovie(m.id);
@@ -426,10 +438,6 @@
       });
     }
 
-    // ==========================================
-    // ADMIN PANEL & TMDB IMPORT LOGIC
-    // ==========================================
-
     let currentAdminTMDBType = 'movie';
 
     function openAdminPanel() {
@@ -437,14 +445,13 @@
       document.getElementById('adminModalTitle').innerText = "📝 Add New Content";
       resetAdminForm();
       renderAdminList();
-      fetchAdminTMDB('Trending', document.querySelector('#adminTmdbChips .chip')); // Load trending by default
+      fetchAdminTMDB('Trending', document.querySelector('#adminTmdbChips .chip'));
       document.getElementById('adminPanel').style.display = 'flex';
     }
 
     function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
 
     async function fetchAdminTMDB(category, el) {
-      // Update UI Chips in Admin
       const chips = document.getElementById('adminTmdbChips').querySelectorAll('.chip');
       chips.forEach(c => c.classList.remove('active'));
       if(el) el.classList.add('active');
@@ -499,7 +506,6 @@
       }
     }
 
-    // CLICK TMDB MOVIE -> FILL FORM INSTANTLY
     async function autoFillAdminForm(tmdbId, mediaType, srcCategory) {
       try {
         const type = mediaType === 'tv' ? 'tv' : 'movie';
@@ -509,21 +515,19 @@
         document.getElementById('titleInput').value = data.title || data.name || '';
         document.getElementById('imdbInput').value = data.vote_average ? data.vote_average.toFixed(1) : '';
         
-        // Guess Category based on tab clicked
         let catValue = srcCategory;
         if (srcCategory === 'Trending') {
            catValue = type === 'tv' ? 'Web Series' : (data.original_language === 'hi' ? 'Bollywood' : 'Hollywood');
         }
         document.getElementById('catInput').value = catValue;
 
-        // Auto select Genre based on TMDB first genre
         if (data.genres && data.genres.length > 0) {
           const tmdbGen = data.genres[0].name;
           const options = Array.from(document.getElementById('genreInput').options).map(o => o.value);
           if (options.includes(tmdbGen)) {
             document.getElementById('genreInput').value = tmdbGen;
           } else {
-             document.getElementById('genreInput').value = 'Action'; // Default fallback
+             document.getElementById('genreInput').value = 'Action';
           }
         }
 
@@ -535,27 +539,20 @@
         const trailer = data.videos?.results?.find(v => v.type === 'Trailer' && v.site === 'YouTube');
         document.getElementById('trailerInput').value = trailer ? `https://www.youtube.com/embed/${trailer.key}` : '';
 
-        // Leave video links empty for manual entry
         document.getElementById('okruInput').value = '';
         document.getElementById('streamInput').value = '';
         
-        // Scroll to form slightly
         document.getElementById('adminModalTitle').scrollIntoView({ behavior: 'smooth' });
-        
       } catch (err) {
         alert("Failed to fetch full details.");
       }
     }
 
-    // ==========================================
-    // SAVE TO FIREBASE & PLAY LOGIC
-    // ==========================================
-
     async function saveMovie() {
       const title = document.getElementById('titleInput').value.trim();
       const imdb = document.getElementById('imdbInput').value.trim();
       const category = document.getElementById('catInput').value;
-      const genre = document.getElementById('genreInput').value; // Saved Genre
+      const genre = document.getElementById('genreInput').value;
       const cast = document.getElementById('castInput').value.trim();
       const desc = document.getElementById('descInput').value.trim();
       const poster = document.getElementById('posterInput').value.trim();
@@ -588,7 +585,6 @@
       }
     }
 
-    // PLAY FIREBASE MOVIE
     function playFirebaseMovie(id) {
       activeMovieObj = movies.find(m => m.id === id);
       if (!activeMovieObj) return;
@@ -620,11 +616,11 @@
       const btn2 = document.getElementById('btnServer2');
 
       let targetUrl = '';
-      if (serverNum === 1) { // 1st is Streamtape now
+      if (serverNum === 1) {
         targetUrl = fixStreamtapeUrl(activeMovieObj.streamUrl);
         btn1.classList.add('active');
         btn2.classList.remove('active');
-      } else { // 2nd is Ok.ru now
+      } else {
         targetUrl = fixOkruUrl(activeMovieObj.okruUrl || activeMovieObj.streamUrl);
         btn2.classList.add('active');
         btn1.classList.remove('active');
@@ -637,7 +633,6 @@
       }
     }
 
-    // UTILITIES
     function closePlayer() { 
       document.getElementById('playerModal').style.display = 'none';
       document.getElementById('iframeContainer').innerHTML = '';
